@@ -1,5 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:xscan/brand%20view/helpers/db.dart';
 import 'package:xscan/brand%20view/models/brand_manufacturer.dart';
 import 'package:xscan/brand%20view/models/product.dart';
@@ -8,6 +8,8 @@ import 'package:xscan/worker/models/scanmodel.dart';
 import '../../brand view/models/brand.dart';
 import '../../brand view/models/manufacturer.dart';
 import '../models/employee.dart';
+
+part 'manu_providers.g.dart';
 
 final loadManuInfoProvider =
     FutureProvider.family<Manufacturer, String>((ref, id) async {
@@ -57,4 +59,53 @@ final deleteStaff = FutureProvider.family<void, String>((ref, id) async {
 final getPendingRequestProvider =
     FutureProvider.family<List<ScanModel>, String>((ref, id) async {
   var db = GetIt.I<DataBase>();
+  return await db.getPendingApprovalManu(id);
 });
+
+/// approve pending
+
+enum ManuApprovePendingEnum { success, failure, loading, idle }
+
+@riverpod
+class ManuApprovePending extends _$ManuApprovePending {
+  @override
+  FutureOr<ManuApprovePendingEnum> build() async {
+    return ManuApprovePendingEnum.idle;
+  }
+
+  approvePending(String barcode, String businessID) async {
+    state = await AsyncValue.guard(() {
+      return Future.delayed(const Duration(seconds: 0), () async {
+        var db = GetIt.I<DataBase>();
+        await db.approveProductsManu(barcode, businessID);
+        return ManuApprovePendingEnum.success;
+      });
+    });
+  }
+}
+
+/// pending requets: waiting for brand to respond
+
+// enum ManuBrandPendingEnum { success, idle, pending, approved }
+
+// @riverpod
+// class ManuBrandPending extends _$ManuBrandPending {
+//   @override
+//   FutureOr<ManuBrandPendingEnum> build() async {
+//     return ManuBrandPendingEnum.idle;
+//   }
+
+//   approvePending(String barcode, String businessID) async {
+//     state = await AsyncValue.guard(() {
+//       return Future.delayed(const Duration(seconds: 0), () async {
+//         var db = GetIt.I<DataBase>();
+//         return (await db.requestsWaitingForBrandResponse(
+//           businessID,
+//           barcode,
+//         ))
+//             ? ManuBrandPendingEnum.approved
+//             : ManuBrandPendingEnum.pending;
+//       });
+//     });
+//   }
+// }

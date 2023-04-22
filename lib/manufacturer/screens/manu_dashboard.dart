@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
 import 'package:xscan/manufacturer/screens/add_new_location.dart';
+import 'package:xscan/manufacturer/screens/pending_approval.dart';
 
 import '../../worker/models/scanmodel.dart';
 import '../models/employee.dart';
@@ -89,9 +90,17 @@ class _StatisticsView extends ConsumerWidget {
     }, loading: () {
       return const CircularProgressIndicator.adaptive();
     });
-    var pendingWidget =
-        ref.watch(getThingsProducedToday(data.id)).when(data: (int data) {
-      return Text("Number of things produced today is $data");
+    var pendingWidget = ref.watch(getPendingRequestProvider(data.id)).when(
+        data: (List<ScanModel> data) {
+      return ListTile(
+          onTap: () async {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return ManuPendingApprovalView(
+                models: data,
+              );
+            }));
+          },
+          title: Text("Items Awaiting your approval: ${data.length}"));
     }, error: (Object error, StackTrace stackTrace) {
       return const Text("Failed to load");
     }, loading: () {
@@ -106,6 +115,7 @@ class _StatisticsView extends ConsumerWidget {
             todayWidget,
             Text("Number of items in productions: ${data.productions.length}"),
             numberWidget,
+            pendingWidget
           ],
         ));
   }

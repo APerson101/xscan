@@ -324,7 +324,7 @@ class DataBase {
   Future<int> getTodayProductions({required String id}) async {
     var docs = (await store
             .collection('barcodes')
-            .where('employee.businessID', isEqualTo: id)
+            .where('scanner.businessID', isEqualTo: id)
             .where('timeAdded',
                 isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch)
             .get())
@@ -336,7 +336,7 @@ class DataBase {
   Future<List<ScanModel>> getScannedItems({required String id}) async {
     var docs = (await store
             .collection('barcodes')
-            .where('employee.businessID', isEqualTo: id)
+            .where('scanner.businessID', isEqualTo: id)
             .get())
         .docs;
 
@@ -595,6 +595,46 @@ class DataBase {
   getEmpScanStatus(String barcode) async {
     var updates = await getBarcodescanhistory(barcode);
     return updates.isEmpty ? false : true;
+  }
+
+  Future<List<ScanModel>> getPendingApprovalManu(String businessID) async {
+    var allScanned = await getAllScannedBarcode();
+    var ss = <ScanModel>[];
+    var businessScanned = allScanned
+        .where((element) => element.scanner!.businessID == businessID)
+        .toList();
+
+    for (var bu in businessScanned) {
+      var history = await getBarcodescanhistory(bu.barcode!);
+      if (history.isEmpty) {
+        // unapproved
+        ss.add(bu);
+      }
+    }
+    return ss;
+  }
+
+  approveProductsManu(String barcode, String businessID) async {
+    await store.collection('barcodes/$barcode/updates').add(ScanModel(
+            barcode: barcode,
+            timeAdded: DateTime.now(),
+            scanner: Employee(
+                email: 'APPROVAL',
+                password: 'APPROVAL',
+                name: 'BUSINESS APPROVAL',
+                id: 'id',
+                businessID: businessID))
+        .toMap());
+  }
+
+  Future<bool> requestsWaitingForBrandResponse(
+      String businessID, String barcode) async {
+    var history = await getBarcodescanhistory(barcode);
+    if (history.length <= 1) {
+      // unapproved
+      return false;
+    }
+    return true;
   }
 }
 
