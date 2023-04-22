@@ -20,8 +20,8 @@ class UserMain extends ConsumerWidget {
                 if (context.mounted) {
                   Navigator.of(context)
                       .push(MaterialPageRoute(builder: (context) {
-                    return ScannedInfo(
-                      barcode: barcodeScanRes,
+                    return const ScannedInfo(
+                      barcode: '32f922cd-d304-4c1c-9102-58d68022e94a',
                     );
                   }));
                 }
