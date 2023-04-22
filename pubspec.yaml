@@ -1,0 +1,51 @@
+name: xscan
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=2.19.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.3.5
+  gap: ^3.0.0
+  google_fonts: ^4.0.3
+  lottie: ^2.3.2
+  mobile_scanner: ^3.2.0
+  flutter_barcode_scanner: ^2.0.0
+  pretty_qr_code: ^2.0.3
+  printing: ^5.10.3
+  syncfusion_flutter_pdf: ^21.1.41
+  image_picker: ^0.8.7+3
+  syncfusion_flutter_datagrid: ^21.1.41
+  email_validator: ^2.1.17
+  uuid: ^3.0.7
+  get_it: ^7.2.0
+  firebase_core: ^2.10.0
+  firebase_auth: ^4.3.0
+  firebase_storage: ^11.1.1
+  cloud_firestore: ^4.5.2
+  shared_preferences: ^2.1.0
+  isar: ^3.1.0
+  isar_flutter_libs: ^3.1.0
+  syncfusion_flutter_barcodes: ^21.1.41
+  cloud_functions: ^4.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  build_runner: ^2.3.3
+  riverpod_generator: ^2.2.0
+  riverpod_annotation: ^2.1.0
+  isar_generator: ^3.1.0
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/fonts/

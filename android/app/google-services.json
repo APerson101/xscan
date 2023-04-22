@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "237948458991",
+    "project_id": "xscan-9120f",
+    "storage_bucket": "xscan-9120f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237948458991:android:7142570d7db5c6b6e4881a",
+        "android_client_info": {
+          "package_name": "com.example.xscan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "237948458991-v0aifkia7k9ngurapah9a42p2a3rgsao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx_G8yMONDMv_vE_eb0OL_TXwskCBi1lM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "237948458991-v0aifkia7k9ngurapah9a42p2a3rgsao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
