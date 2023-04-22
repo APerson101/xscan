@@ -89,6 +89,14 @@ class _StatisticsView extends ConsumerWidget {
     }, loading: () {
       return const CircularProgressIndicator.adaptive();
     });
+    var pendingWidget =
+        ref.watch(getThingsProducedToday(data.id)).when(data: (int data) {
+      return Text("Number of things produced today is $data");
+    }, error: (Object error, StackTrace stackTrace) {
+      return const Text("Failed to load");
+    }, loading: () {
+      return const CircularProgressIndicator.adaptive();
+    });
     return DecoratedBox(
         decoration: BoxDecoration(
             color: Colors.amber.shade50,

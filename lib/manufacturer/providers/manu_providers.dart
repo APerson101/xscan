@@ -53,3 +53,8 @@ final deleteStaff = FutureProvider.family<void, String>((ref, id) async {
   var db = GetIt.I<DataBase>();
   await db.deleteStaff(id);
 });
+
+final getPendingRequestProvider =
+    FutureProvider.family<List<ScanModel>, String>((ref, id) async {
+  var db = GetIt.I<DataBase>();
+});
