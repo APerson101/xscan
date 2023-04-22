@@ -91,6 +91,7 @@ class AddNewManufacturerView extends ConsumerWidget {
                       onPressed: () {
                         var agreement = BrandManufaturer(
                             brandID: brand.id,
+                            product: ref.watch(selectedProduct)!,
                             id: const Uuid().v4().toString(),
                             manufacturerID: ref.watch(selectedManufacturer)!.id,
                             productID: ref.watch(selectedProduct)!.id,

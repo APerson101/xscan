@@ -67,4 +67,4 @@ class LoginState extends _$LoginState {
 
 final userTypeProvider = StateProvider<UserTypesEnum?>((ref) => null);
 
-enum UserTypesEnum { admin, brand, manufacturer, employee }
+enum UserTypesEnum { admin, brand, manufacturer, employee, sales }

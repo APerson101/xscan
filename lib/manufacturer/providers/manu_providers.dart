@@ -8,6 +8,7 @@ import 'package:xscan/worker/models/scanmodel.dart';
 import '../../brand view/models/brand.dart';
 import '../../brand view/models/manufacturer.dart';
 import '../models/employee.dart';
+import '../models/file.dart';
 
 part 'manu_providers.g.dart';
 
@@ -73,11 +74,24 @@ class ManuApprovePending extends _$ManuApprovePending {
     return ManuApprovePendingEnum.idle;
   }
 
-  approvePending(String barcode, String businessID) async {
+  approvePending(ScanModel e, String barcode, Manufacturer business) async {
     state = await AsyncValue.guard(() {
       return Future.delayed(const Duration(seconds: 0), () async {
         var db = GetIt.I<DataBase>();
-        await db.approveProductsManu(barcode, businessID);
+        await db.approveProductsManu(barcode, business.id);
+        var file = FileModelHedera(
+          manufacturerApproved: 'true',
+          brandApproved: 'false',
+          brandName: e.brandName!,
+          created: DateTime.now(),
+          productName: e.productName!,
+          productID: e.productID!,
+          barcode: barcode,
+          manufacturerName: business.name,
+        );
+        var pk = await db.getPKfromName(e.brandName!);
+        await db.saveUpdateToFile(
+            business.privateKey, file.toJson(), file.toMap(), barcode, pk);
         return ManuApprovePendingEnum.success;
       });
     });

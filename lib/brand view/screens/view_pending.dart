@@ -43,7 +43,7 @@ class BrandPendingView extends ConsumerWidget {
                                           .watch(approveProductStateProvider
                                               .notifier)
                                           .approveProductFromManu(
-                                              item.barcode!, brand.id);
+                                              item.barcode!, brand);
                                     },
                                     child: const Text("Ok!")),
                                 TextButton(

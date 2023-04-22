@@ -8,12 +8,16 @@ class Brand {
   String id;
   String location;
   DateTime created;
+  String privateKey;
+  String accountID;
   List<Product> catalog;
   Brand({
     required this.name,
     required this.id,
     required this.location,
     required this.created,
+    required this.privateKey,
+    required this.accountID,
     required this.catalog,
   });
 
@@ -22,6 +26,8 @@ class Brand {
     String? id,
     String? location,
     DateTime? created,
+    String? privateKey,
+    String? accountID,
     List<Product>? catalog,
   }) {
     return Brand(
@@ -29,6 +35,8 @@ class Brand {
       id: id ?? this.id,
       location: location ?? this.location,
       created: created ?? this.created,
+      privateKey: privateKey ?? this.privateKey,
+      accountID: accountID ?? this.accountID,
       catalog: catalog ?? this.catalog,
     );
   }
@@ -39,6 +47,8 @@ class Brand {
       'id': id,
       'location': location,
       'created': created.millisecondsSinceEpoch,
+      'privateKey': privateKey,
+      'accountID': accountID,
       'catalog': catalog.map((x) => x.toMap()).toList(),
     };
   }
@@ -49,6 +59,8 @@ class Brand {
       id: map['id'] ?? '',
       location: map['location'] ?? '',
       created: DateTime.fromMillisecondsSinceEpoch(map['created']),
+      privateKey: map['privateKey'] ?? '',
+      accountID: map['accountID'] ?? '',
       catalog:
           List<Product>.from(map['catalog']?.map((x) => Product.fromMap(x))),
     );
@@ -60,7 +72,7 @@ class Brand {
 
   @override
   String toString() {
-    return 'Brand(name: $name, id: $id, location: $location, created: $created, catalog: $catalog)';
+    return 'Brand(name: $name, id: $id, location: $location, created: $created, privateKey: $privateKey, accountID: $accountID, catalog: $catalog)';
   }
 
   @override
@@ -72,6 +84,8 @@ class Brand {
         other.id == id &&
         other.location == location &&
         other.created == created &&
+        other.privateKey == privateKey &&
+        other.accountID == accountID &&
         listEquals(other.catalog, catalog);
   }
 
@@ -81,6 +95,8 @@ class Brand {
         id.hashCode ^
         location.hashCode ^
         created.hashCode ^
+        privateKey.hashCode ^
+        accountID.hashCode ^
         catalog.hashCode;
   }
 }

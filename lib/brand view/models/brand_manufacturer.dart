@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:xscan/brand%20view/models/product.dart';
+
 class BrandManufaturer {
   String brandID;
   String manufacturerID;
   String productID;
+  Product product;
   int quantity;
   bool userCreated;
   bool manufacturerAgreed;
@@ -13,6 +16,7 @@ class BrandManufaturer {
     required this.brandID,
     required this.manufacturerID,
     required this.productID,
+    required this.product,
     required this.quantity,
     required this.userCreated,
     required this.manufacturerAgreed,
@@ -24,6 +28,7 @@ class BrandManufaturer {
     String? brandID,
     String? manufacturerID,
     String? productID,
+    Product? product,
     int? quantity,
     bool? userCreated,
     bool? manufacturerAgreed,
@@ -34,6 +39,7 @@ class BrandManufaturer {
       brandID: brandID ?? this.brandID,
       manufacturerID: manufacturerID ?? this.manufacturerID,
       productID: productID ?? this.productID,
+      product: product ?? this.product,
       quantity: quantity ?? this.quantity,
       userCreated: userCreated ?? this.userCreated,
       manufacturerAgreed: manufacturerAgreed ?? this.manufacturerAgreed,
@@ -47,6 +53,7 @@ class BrandManufaturer {
       'brandID': brandID,
       'manufacturerID': manufacturerID,
       'productID': productID,
+      'product': product.toMap(),
       'quantity': quantity,
       'userCreated': userCreated,
       'manufacturerAgreed': manufacturerAgreed,
@@ -60,6 +67,7 @@ class BrandManufaturer {
       brandID: map['brandID'] ?? '',
       manufacturerID: map['manufacturerID'] ?? '',
       productID: map['productID'] ?? '',
+      product: Product.fromMap(map['product']),
       quantity: map['quantity']?.toInt() ?? 0,
       userCreated: map['userCreated'] ?? false,
       manufacturerAgreed: map['manufacturerAgreed'] ?? false,
@@ -75,7 +83,7 @@ class BrandManufaturer {
 
   @override
   String toString() {
-    return 'BrandManufaturer(brandID: $brandID, manufacturerID: $manufacturerID, productID: $productID, quantity: $quantity, userCreated: $userCreated, manufacturerAgreed: $manufacturerAgreed, dateCreated: $dateCreated, id: $id)';
+    return 'BrandManufaturer(brandID: $brandID, manufacturerID: $manufacturerID, productID: $productID, product: $product, quantity: $quantity, userCreated: $userCreated, manufacturerAgreed: $manufacturerAgreed, dateCreated: $dateCreated, id: $id)';
   }
 
   @override
@@ -86,6 +94,7 @@ class BrandManufaturer {
         other.brandID == brandID &&
         other.manufacturerID == manufacturerID &&
         other.productID == productID &&
+        other.product == product &&
         other.quantity == quantity &&
         other.userCreated == userCreated &&
         other.manufacturerAgreed == manufacturerAgreed &&
@@ -98,6 +107,7 @@ class BrandManufaturer {
     return brandID.hashCode ^
         manufacturerID.hashCode ^
         productID.hashCode ^
+        product.hashCode ^
         quantity.hashCode ^
         userCreated.hashCode ^
         manufacturerAgreed.hashCode ^

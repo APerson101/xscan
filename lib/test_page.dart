@@ -42,11 +42,11 @@ class TestPageView extends ConsumerWidget {
                   var manuID = receiverAccount['accountID'];
                   var manuKey = receiverAccount['privateKey'];
 
-                  var fileID = await GetIt.I<DataBase>()
-                      .saveUpdateToFile(manuKey, 'filecreatedsaved,');
-                  await GetIt.I<DataBase>()
-                      .appendFile(manuKey, fileID, 'manuUpdated,');
-                  await GetIt.I<DataBase>().getFileContent(fileID);
+                  // var fileID = await GetIt.I<DataBase>()
+                  //     .saveUpdateToFile(manuKey, 'filecreatedsaved,');
+                  // await GetIt.I<DataBase>()
+                  //     .appendFile(manuKey, fileID, 'manuUpdated,');
+                  // await GetIt.I<DataBase>().getFileContent(fileID);
                   var nftID = await GetIt.I<DataBase>()
                       .createNFTReceipt('brand1', 'BND1', senderID);
                   await GetIt.I<DataBase>().transferNFTOwnership(

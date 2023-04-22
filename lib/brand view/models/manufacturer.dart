@@ -8,12 +8,16 @@ class Manufacturer {
   String location;
   String notes;
   String id;
+  String privateKey;
+  String accountID;
   List<Product> productions;
   Manufacturer({
     required this.name,
     required this.location,
     required this.notes,
     required this.id,
+    required this.privateKey,
+    required this.accountID,
     required this.productions,
   });
 
@@ -22,6 +26,8 @@ class Manufacturer {
     String? location,
     String? notes,
     String? id,
+    String? privateKey,
+    String? accountID,
     List<Product>? productions,
   }) {
     return Manufacturer(
@@ -29,6 +35,8 @@ class Manufacturer {
       location: location ?? this.location,
       notes: notes ?? this.notes,
       id: id ?? this.id,
+      privateKey: privateKey ?? this.privateKey,
+      accountID: accountID ?? this.accountID,
       productions: productions ?? this.productions,
     );
   }
@@ -39,6 +47,8 @@ class Manufacturer {
       'location': location,
       'notes': notes,
       'id': id,
+      'privateKey': privateKey,
+      'accountID': accountID,
       'productions': productions.map((x) => x.toMap()).toList(),
     };
   }
@@ -49,6 +59,8 @@ class Manufacturer {
       location: map['location'] ?? '',
       notes: map['notes'] ?? '',
       id: map['id'] ?? '',
+      privateKey: map['privateKey'] ?? '',
+      accountID: map['accountID'] ?? '',
       productions: List<Product>.from(
           map['productions']?.map((x) => Product.fromMap(x))),
     );
@@ -61,7 +73,7 @@ class Manufacturer {
 
   @override
   String toString() {
-    return 'Manufacturer(name: $name, location: $location, notes: $notes, id: $id, productions: $productions)';
+    return 'Manufacturer(name: $name, location: $location, notes: $notes, id: $id, privateKey: $privateKey, accountID: $accountID, productions: $productions)';
   }
 
   @override
@@ -73,6 +85,8 @@ class Manufacturer {
         other.location == location &&
         other.notes == notes &&
         other.id == id &&
+        other.privateKey == privateKey &&
+        other.accountID == accountID &&
         listEquals(other.productions, productions);
   }
 
@@ -82,6 +96,8 @@ class Manufacturer {
         location.hashCode ^
         notes.hashCode ^
         id.hashCode ^
+        privateKey.hashCode ^
+        accountID.hashCode ^
         productions.hashCode;
   }
 }

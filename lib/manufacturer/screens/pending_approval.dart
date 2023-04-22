@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xscan/brand%20view/models/manufacturer.dart';
 import 'package:xscan/worker/models/scanmodel.dart';
 
 import '../providers/manu_providers.dart';
 
 class ManuPendingApprovalView extends ConsumerWidget {
-  const ManuPendingApprovalView({super.key, required this.models});
+  const ManuPendingApprovalView(
+      {super.key, required this.models, required this.manufacturer});
   final List<ScanModel> models;
+  final Manufacturer manufacturer;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(manuApprovePendingProvider, (previous, next) {
@@ -36,8 +39,7 @@ class ManuPendingApprovalView extends ConsumerWidget {
                           onPressed: () {
                             ref
                                 .watch(manuApprovePendingProvider.notifier)
-                                .approvePending(
-                                    e.barcode!, e.scanner!.businessID);
+                                .approvePending(e, e.barcode!, manufacturer);
                             Navigator.of(context).pop();
                           },
                           child: const Text("yes")),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import 'package:xscan/manufacturer/models/employee.dart';
 import 'package:xscan/worker/providers/employee_provider.dart';
 import 'package:xscan/worker/view/scanned_barcode_view.dart';
@@ -33,7 +34,7 @@ class _CameraView extends ConsumerWidget {
             try {
               barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
                   '#ff6666', 'Cancel', false, ScanMode.BARCODE);
-              barcodeScanRes = 'testbarcode';
+              barcodeScanRes = const Uuid().v4().toString();
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                 return ScannedBarcodeView(
                   barcode: barcodeScanRes,

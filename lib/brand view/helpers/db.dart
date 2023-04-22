@@ -3,7 +3,6 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
-import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
 import 'package:xscan/brand%20view/models/brand_manufacturer.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
@@ -12,7 +11,10 @@ import 'package:xscan/brand%20view/models/transfer.dart';
 import 'package:xscan/brand%20view/models/verification.dart';
 import 'package:xscan/brand%20view/providers/login_provider.dart';
 import 'package:xscan/manufacturer/models/employee.dart';
+import 'package:xscan/manufacturer/models/file.dart';
+import 'package:xscan/sales/models/sales_model.dart';
 
+import '../../sales/models/transfermode.dart';
 import '../../worker/models/scanmodel.dart';
 import '../models/manufacturer_summart.dart';
 
@@ -138,54 +140,6 @@ class DataBase {
     await store.collection('manufacturers').add(manu!.toMap());
   }
 
-  createPartnerships() async {
-    var uuid = const Uuid();
-    var uniqueID = uuid.v4().toString();
-    var uniqueID1 = uuid.v4().toString();
-    var uniqueID2 = uuid.v4().toString();
-    var uniqueID3 = uuid.v4().toString();
-    await store.doc('partnerships/$uniqueID').set(BrandManufaturer(
-            brandID: BRAND_ID,
-            manufacturerID: MANU_ID_1,
-            productID: 'id 0',
-            quantity: 40,
-            userCreated: true,
-            id: uniqueID,
-            manufacturerAgreed: true,
-            dateCreated: DateTime.now())
-        .toMap());
-    await store.doc('partnerships/$uniqueID1').set(BrandManufaturer(
-            brandID: BRAND_ID,
-            manufacturerID: MANU_ID_1,
-            productID: 'id 1',
-            quantity: 40,
-            userCreated: true,
-            id: uniqueID1,
-            manufacturerAgreed: true,
-            dateCreated: DateTime.now())
-        .toMap());
-    await store.doc('partnerships/$uniqueID2').set(BrandManufaturer(
-            brandID: BRAND_ID,
-            manufacturerID: MANU_ID_1,
-            productID: 'id 2',
-            quantity: 40,
-            userCreated: true,
-            id: uniqueID2,
-            manufacturerAgreed: true,
-            dateCreated: DateTime.now())
-        .toMap());
-    await store.doc('partnerships/$uniqueID3').set(BrandManufaturer(
-            brandID: BRAND_ID,
-            manufacturerID: MANU_ID_2,
-            productID: 'id 3',
-            quantity: 40,
-            id: uniqueID3,
-            userCreated: true,
-            manufacturerAgreed: false,
-            dateCreated: DateTime.now())
-        .toMap());
-  }
-
   createEmployees(String id, Employee emp) async {
     await store.doc('employees/$id').set(emp.toMap());
   }
@@ -246,14 +200,38 @@ class DataBase {
     return all;
   }
 
-  saveUpdateToFile(String manufacturerPK, String textTobeStored) async {
+  Future getPKFromID(String brandID) async {
+    return (await store
+            .collection('brands')
+            .where('id', isEqualTo: brandID)
+            .limit(1)
+            .get())
+        .docs[0]
+        .get('privateKey');
+  }
+
+  saveUpdateToFile(String manufacturerPK, String textTobeStored,
+      dynamic jsonFormat, String barcode, String brandPK) async {
     String fileID = (await functions.httpsCallable('storeBarcodeInFile').call({
-      'data': {'pk': manufacturerPK, 'text': textTobeStored}
+      'data': {'pk': brandPK, 'text': '$textTobeStored --- '}
     }))
         .data;
 
     debugPrint('created file id is: $fileID');
+
+    // save things to the database
+    (await store
+        .doc('files/$fileID')
+        .set({'fileID': fileID, 'barcode': barcode}));
+    (await store.collection('files/$fileID/updates').add(jsonFormat));
     return fileID;
+  }
+
+  Future<FileModelHedera> getFileContentDB(String fileID) async {
+    var dy = (await store.collection('files/$fileID/updates').limit(1).get())
+        .docs[0]
+        .data();
+    return FileModelHedera.fromMap(dy);
   }
 
   getFileContent(String fileID) async {
@@ -265,12 +243,33 @@ class DataBase {
     debugPrint('file content is: $content');
   }
 
-  appendFile(
-      String manufacturerPK, String fileID, String textTobeStored) async {
+  getFileFromBarcode(String barcode) async {
+    return (await store
+            .collection('files')
+            .where('barcode', isEqualTo: barcode)
+            .limit(1)
+            .get())
+        .docs[0]
+        .id;
+  }
+
+  appendFileBrand(
+    String brandPK,
+    String fileID,
+    String textTobeStored,
+  ) async {
     await functions.httpsCallable('appendFile').call({
-      'data': {'fileId': fileID, 'text': textTobeStored, 'pk': manufacturerPK}
+      'data': {'fileId': fileID, 'text': '$textTobeStored --- ', 'pk': brandPK}
     });
     debugPrint('file appent success');
+
+    var id = (await store.collection('files/$fileID/updates').limit(1).get())
+        .docs[0]
+        .id;
+
+    (await store
+        .doc('files/$fileID/updates/$id')
+        .update({'brandApproved': 'true'}));
   }
 
   createNFTReceipt(
@@ -389,10 +388,23 @@ class DataBase {
     return Brand.fromMap(data.data());
   }
 
-  acceptOffer(String offerID) async {
+  acceptOffer(String offerID, Product product, String manufacturerID) async {
     await store
         .doc('partnerships/$offerID')
         .update({'manufacturerAgreed': true});
+
+    var id = (await store
+            .collection('manufacturers')
+            .where('id', isEqualTo: manufacturerID)
+            .limit(1)
+            .get())
+        .docs[0]
+        .id;
+    (await store.doc('manufacturers/$id').update({
+      'productions': FieldValue.arrayUnion([product.toMap()])
+    }));
+
+    // add product to manufacturer
   }
 
   deleteStaff(String id) async {
@@ -425,9 +437,7 @@ class DataBase {
   }
 
   sendManufacturerRequest(BrandManufaturer request) async {
-    var uuid = const Uuid();
-    var uniqueID = uuid.v4().toString();
-    await store.doc('partnerships/$uniqueID').set(request.toMap());
+    await store.doc('partnerships/${request.id}').set(request.toMap());
   }
 
   withdrawManufacturerRequest(
@@ -485,7 +495,8 @@ class DataBase {
   Future<List<ScanModel>> getPendingApproval(String brandName) async {
     var allScanned = await getAllScannedBarcode();
     var particularBrand =
-        allScanned.where((element) => element.brandName == brandName);
+        allScanned.where((element) => element.brandName == brandName).toList();
+
     var ss = <ScanModel>[];
     for (var scanned in particularBrand) {
       var history = await getBarcodescanhistory(scanned.barcode!);
@@ -589,7 +600,6 @@ class DataBase {
     for (var item in docs) {
       all.add(ScanModel.fromMap(item.data()));
     }
-    print(all.length);
     return all;
   }
 
@@ -646,6 +656,60 @@ class DataBase {
             .get())
         .docs[0];
     return doc.get('name');
+  }
+
+  Future<SalesModel> getSalesFromID(String id) async {
+    var data = (await store
+            .collection('sales')
+            .where('id', isEqualTo: id)
+            .limit(1)
+            .get())
+        .docs[0]
+        .data();
+    return SalesModel.fromMap(data);
+  }
+
+  getBarcodeInfo({required String code}) async {
+    var data = (await store.doc('barcodes/$code').get()).data();
+    return ScanModel.fromMap(data!);
+  }
+
+  appendFileSales(String barcode, SalesModel staff, fileID, String to,
+      String brandPK) async {
+    //
+    var txn = TransferModel(from: staff.accountID, to: to);
+    await functions.httpsCallable('appendFile').call({
+      'data': {'fileId': fileID, 'text': '${txn.toJson()} --- ', 'pk': brandPK}
+    });
+    debugPrint('file appent success');
+  }
+
+  getPKfromName(String name) async {
+    return (await store
+            .collection('brands')
+            .where('name', isEqualTo: name)
+            .limit(1)
+            .get())
+        .docs[0]
+        .get('privateKey');
+  }
+
+  createSales(String id, SalesModel salesman) async {
+    (await store.doc('sales/$id').set(salesman.toMap()));
+  }
+
+  getAddressFromID(String id) async {
+    return (await store
+            .collection('brands')
+            .where('id', isEqualTo: id)
+            .limit(1)
+            .get())
+        .docs[0]
+        .get('accountID');
+  }
+
+  saveTransfer(Transfer transfer) async {
+    (await store.collection('transfers').add(transfer.toMap()));
   }
 }
 

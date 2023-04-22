@@ -6,14 +6,12 @@ class Transfer {
   String receiptID;
   String brandID;
   String productID;
-  String cost;
   Transfer({
     required this.senderAddress,
     required this.receiverAddress,
     required this.receiptID,
     required this.brandID,
     required this.productID,
-    required this.cost,
   });
 
   Transfer copyWith({
@@ -22,7 +20,6 @@ class Transfer {
     String? receiptID,
     String? brandID,
     String? productID,
-    String? cost,
   }) {
     return Transfer(
       senderAddress: senderAddress ?? this.senderAddress,
@@ -30,7 +27,6 @@ class Transfer {
       receiptID: receiptID ?? this.receiptID,
       brandID: brandID ?? this.brandID,
       productID: productID ?? this.productID,
-      cost: cost ?? this.cost,
     );
   }
 
@@ -41,7 +37,6 @@ class Transfer {
       'receiptID': receiptID,
       'brandID': brandID,
       'productID': productID,
-      'cost': cost,
     };
   }
 
@@ -52,7 +47,6 @@ class Transfer {
       receiptID: map['receiptID'] ?? '',
       brandID: map['brandID'] ?? '',
       productID: map['productID'] ?? '',
-      cost: map['cost'] ?? '',
     );
   }
 
@@ -63,7 +57,7 @@ class Transfer {
 
   @override
   String toString() {
-    return 'Transfer(senderAddress: $senderAddress, receiverAddress: $receiverAddress, receiptID: $receiptID, brandID: $brandID, productID: $productID, cost: $cost)';
+    return 'Transfer(senderAddress: $senderAddress, receiverAddress: $receiverAddress, receiptID: $receiptID, brandID: $brandID, productID: $productID)';
   }
 
   @override
@@ -75,8 +69,7 @@ class Transfer {
         other.receiverAddress == receiverAddress &&
         other.receiptID == receiptID &&
         other.brandID == brandID &&
-        other.productID == productID &&
-        other.cost == cost;
+        other.productID == productID;
   }
 
   @override
@@ -85,7 +78,6 @@ class Transfer {
         receiverAddress.hashCode ^
         receiptID.hashCode ^
         brandID.hashCode ^
-        productID.hashCode ^
-        cost.hashCode;
+        productID.hashCode;
   }
 }

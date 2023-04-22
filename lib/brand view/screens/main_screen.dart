@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xscan/sales/sales_main.dart';
 import 'package:xscan/worker/view/worker_main.dart';
 
 import '../../manufacturer/screens/main_screen_manufacturer.dart';
@@ -22,6 +23,8 @@ class MainView extends ConsumerWidget {
         return const Center();
       case UserTypesEnum.employee:
         return WorkerMain(id: FirebaseAuth.instance.currentUser!.uid);
+      case UserTypesEnum.sales:
+        return SalesView(id: FirebaseAuth.instance.currentUser!.uid);
       default:
         return Center(
           child: Text(

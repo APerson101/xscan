@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
 import 'package:xscan/brand%20view/screens/view_pending.dart';
 
+import '../helpers/db.dart';
+import '../models/manufacturer.dart';
 import '../providers/brand_providers.dart';
 import 'add_new_manufacturer.dart';
 import 'add_new_product.dart';
@@ -67,24 +70,50 @@ class _ActionButtons extends ConsumerWidget {
   final Brand brand;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
-      children: [
-        ElevatedButton(
-            onPressed: () {
-              //initialize add product page
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => AddNewProductView(brand: brand)));
-            },
-            child: const Center(child: Text("Add New Product"))),
-        ElevatedButton(
-            onPressed: () {
-              //initialize add manufacturer page
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return AddNewManufacturerView(brand: brand);
-              }));
-            },
-            child: const Center(child: Text("Add Manufacturer"))),
-      ],
+    return SizedBox(
+      width: 350,
+      child: Row(
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                //initialize add product page
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => AddNewProductView(brand: brand)));
+              },
+              child: const Center(child: Text("Add New Product"))),
+          ElevatedButton(
+              onPressed: () {
+                //initialize add manufacturer page
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return AddNewManufacturerView(brand: brand);
+                }));
+              },
+              child: const Center(child: Text("get file content"))),
+          ElevatedButton(
+              onPressed: () async {
+                var db = GetIt.I<DataBase>();
+                var empID = await db.getFileContent('0.0.4350922');
+
+                return;
+                var brandID = await db.createFakeUser('m2@x.com', '11111111');
+                await db.storeFakeUser(brandID, 'manufacturer');
+                var account = await db.createAccount();
+                String accID = account['accountID'];
+                String pk = account['privateKey'];
+                await db.createManufacturers(
+                    manu: Manufacturer(
+                        name: 'manufacturer name',
+                        location: 'Wuse',
+                        notes: 'Notes about this guy',
+                        id: brandID,
+                        productions: [],
+                        accountID: accID,
+                        privateKey: pk));
+              },
+              child: const Text("Create second manufacturer"))
+        ],
+      ),
     );
   }
 }

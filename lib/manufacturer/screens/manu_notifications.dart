@@ -17,7 +17,6 @@ class ManuNotifications extends ConsumerWidget {
         if (status == AcceptOfferCreationState.success) {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Success")));
-          Navigator.of(context).pop();
         }
       }, error: (Object error, StackTrace stackTrace) {
         ScaffoldMessenger.of(context)
@@ -61,7 +60,9 @@ class ManuNotifications extends ConsumerWidget {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      ref.watch(acceptOfferProvider.notifier).acceptOffer(e.id);
+                      ref
+                          .watch(acceptOfferProvider.notifier)
+                          .acceptOffer(e.id, e.product, e.manufacturerID);
                     },
                     child: const Text("Accept proposal"))
               ],

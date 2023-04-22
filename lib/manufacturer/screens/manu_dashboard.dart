@@ -70,12 +70,12 @@ class _ActionButtons extends ConsumerWidget {
 }
 
 class _StatisticsView extends ConsumerWidget {
-  const _StatisticsView(this.data);
-  final Manufacturer data;
+  const _StatisticsView(this.manu);
+  final Manufacturer manu;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var numberWidget =
-        ref.watch(getEmployees(data.id)).when(data: (List<Employee> data) {
+        ref.watch(getEmployees(manu.id)).when(data: (List<Employee> data) {
       return Text("Number of employees is ${data.length}");
     }, error: (Object error, StackTrace stackTrace) {
       return const Text("Failed to load");
@@ -83,20 +83,21 @@ class _StatisticsView extends ConsumerWidget {
       return const CircularProgressIndicator.adaptive();
     });
     var todayWidget =
-        ref.watch(getThingsProducedToday(data.id)).when(data: (int data) {
+        ref.watch(getThingsProducedToday(manu.id)).when(data: (int data) {
       return Text("Number of things produced today is $data");
     }, error: (Object error, StackTrace stackTrace) {
       return const Text("Failed to load");
     }, loading: () {
       return const CircularProgressIndicator.adaptive();
     });
-    var pendingWidget = ref.watch(getPendingRequestProvider(data.id)).when(
+    var pendingWidget = ref.watch(getPendingRequestProvider(manu.id)).when(
         data: (List<ScanModel> data) {
       return ListTile(
           onTap: () async {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
               return ManuPendingApprovalView(
                 models: data,
+                manufacturer: manu,
               );
             }));
           },
@@ -113,7 +114,7 @@ class _StatisticsView extends ConsumerWidget {
         child: Column(
           children: [
             todayWidget,
-            Text("Number of items in productions: ${data.productions.length}"),
+            Text("Number of items in productions: ${manu.productions.length}"),
             numberWidget,
             pendingWidget
           ],

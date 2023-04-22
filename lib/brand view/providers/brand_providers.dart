@@ -92,13 +92,17 @@ class ApproveProductState extends _$ApproveProductState {
     return ApproveProductStateEnum.idle;
   }
 
-  approveProductFromManu(String barcode, String brandID) async {
+  approveProductFromManu(String barcode, Brand brand) async {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
       await db.approveProducts(
         barcode,
-        brandID,
+        brand.id,
       );
+      var fileID = await db.getFileFromBarcode(barcode);
+      var file = await db.getFileContentDB(fileID);
+      file.brandApproved = 'true';
+      await db.appendFileBrand(brand.privateKey, fileID, file.toJson());
       return ApproveProductStateEnum.successful;
     });
   }
