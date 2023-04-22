@@ -92,7 +92,7 @@ class ApproveProductState extends _$ApproveProductState {
     return ApproveProductStateEnum.idle;
   }
 
-  withdrawManufacturerRequest(String barcode, String brandID) async {
+  approveProductFromManu(String barcode, String brandID) async {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
       await db.approveProducts(
@@ -119,4 +119,10 @@ final getOwnershipTransferProvider =
     FutureProvider.family<List<Transfer>, String>((ref, brandID) async {
   var db = GetIt.I<DataBase>();
   return await db.getAllOwnership(brandID);
+});
+
+final getBusinessNameFromString =
+    FutureProvider.family<String, String>((ref, id) async {
+  var db = GetIt.I<DataBase>();
+  return await db.getBusinessNameFromID(id);
 });

@@ -482,14 +482,14 @@ class DataBase {
                 numberOfItemsProducedForBrand[index].toString()));
   }
 
-  Future<List<ScanModel>> getPendingApproval(String brandID) async {
+  Future<List<ScanModel>> getPendingApproval(String brandName) async {
     var allScanned = await getAllScannedBarcode();
+    var particularBrand =
+        allScanned.where((element) => element.brandName == brandName);
     var ss = <ScanModel>[];
-    for (var scanned in allScanned) {
+    for (var scanned in particularBrand) {
       var history = await getBarcodescanhistory(scanned.barcode!);
-      var verified =
-          history.where((element) => element.scanner!.name == brandID).toList();
-      if (verified.isEmpty && history.length >= 2) {
+      if (history.length == 1) {
         // unapproved
         ss.add(scanned);
       }
@@ -561,9 +561,10 @@ class DataBase {
     var docs = (await store.collection('brands').get()).docs;
     for (var doc in docs) {
       var mapped = Brand.fromMap(doc.data());
-      var brand =
-          mapped.catalog.firstWhere((element) => element.id == productID);
-      return brand.name;
+      var brand = mapped.catalog.where((element) => element.id == productID);
+      if (brand.isNotEmpty) {
+        return mapped.name;
+      }
     }
     return '';
   }
@@ -635,6 +636,16 @@ class DataBase {
       return false;
     }
     return true;
+  }
+
+  Future<String> getBusinessNameFromID(String id) async {
+    var doc = (await store
+            .collection('manufacturers')
+            .where('id', isEqualTo: id)
+            .limit(1)
+            .get())
+        .docs[0];
+    return doc.get('name');
   }
 }
 

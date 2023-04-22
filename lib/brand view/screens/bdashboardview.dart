@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
+import 'package:xscan/brand%20view/screens/view_pending.dart';
 
 import '../providers/brand_providers.dart';
 import 'add_new_manufacturer.dart';
@@ -36,7 +37,7 @@ class BDashboardView extends ConsumerWidget {
               top: 100,
               left: 0,
               right: 0,
-              height: 80,
+              height: 100,
               child: _BrandStats(brand: brand)),
           Positioned(
               top: 185,
@@ -103,12 +104,26 @@ class _BrandStats extends ConsumerWidget {
         data: (data) => Text(data.length.toString()),
         error: (er, st) => const Center(child: Text("ERROR")),
         loading: () => const CircularProgressIndicator.adaptive());
-    return Row(
-      children: [
-        Column(
-          children: [verifications, resold],
-        ),
-      ],
+    var pendingApproval =
+        ref.watch(getPendingApprovalProvider(brand.name)).when(
+            data: (data) {
+              return ListTile(
+                onTap: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return BrandPendingView(
+                      data: data,
+                      brand: brand,
+                    );
+                  }));
+                },
+                title: Text("need your approval: ${data.length}"),
+              );
+            },
+            error: (er, st) => const Center(child: Text("ERROR")),
+            loading: () => const CircularProgressIndicator.adaptive());
+    return Column(
+      children: [verifications, resold, pendingApproval],
     );
   }
 }
