@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/helpers/db.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
@@ -24,17 +23,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   GetIt.I.registerSingleton<DataBase>(DataBase());
-  FirebaseFirestore.instance.settings = const Settings(
-      host: '192.168.8.100:8080', sslEnabled: false, persistenceEnabled: false);
-  GetIt.I.registerSingleton<FirebaseAuth>(
-      FirebaseAuth.instance..useAuthEmulator('192.168.8.100', 9099));
-  GetIt.I.registerSingleton<FirebaseFirestore>(
-      FirebaseFirestore.instance..useFirestoreEmulator('192.168.8.100', 8080));
-  // GetIt.I.registerSingleton<FirebaseStorage>(FirebaseStorage.instance);
-  GetIt.I.registerSingleton<FirebaseFunctions>(
-      FirebaseFunctions.instance..useFunctionsEmulator('192.168.8.100', 5001));
-  GetIt.I.registerSingleton<SharedPreferences>(
-      await SharedPreferences.getInstance());
+  // FirebaseFirestore.instance.settings = const Settings(
+  //     host: '192.168.8.100:8080', sslEnabled: false, persistenceEnabled: false);
+  GetIt.I.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
+  GetIt.I.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
+  GetIt.I.registerSingleton<FirebaseFunctions>(FirebaseFunctions.instance);
+  // GetIt.I.registerSingleton<FirebaseAuth>(
+  //     FirebaseAuth.instance..useAuthEmulator('192.168.8.100', 9099));
+  // GetIt.I.registerSingleton<FirebaseFirestore>(
+  //     FirebaseFirestore.instance..useFirestoreEmulator('192.168.8.100', 8080));
+  // GetIt.I.registerSingleton<FirebaseFunctions>(
+  //     FirebaseFunctions.instance..useFunctionsEmulator('192.168.8.100', 5001));
+
   runApp(const ProviderScope(child: MainApp()));
 }
 
