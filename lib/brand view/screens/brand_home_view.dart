@@ -4,7 +4,6 @@ import 'package:xscan/brand%20view/providers/brand_providers.dart';
 import 'package:xscan/brand%20view/screens/products_view.dart';
 import 'package:xscan/brand%20view/screens/profile_view.dart';
 
-import '../providers/login_provider.dart';
 import 'bdashboardview.dart';
 
 class BrandHomeView extends ConsumerWidget {
@@ -16,14 +15,7 @@ class BrandHomeView extends ConsumerWidget {
         bottomNavigationBar: const BrandBottomNavBar(),
         appBar: AppBar(
           centerTitle: true,
-          title: const Text("Brand Dashboard"),
-          actions: [
-            ElevatedButton(
-                onPressed: () {
-                  ref.watch(loginStateProvider.notifier).logout();
-                },
-                child: const Text("Logout"))
-          ],
+          title: const Text("Welcome back!"),
         ),
         body: SizedBox.expand(child: _CurrentView(id: id)));
   }

@@ -42,7 +42,7 @@ class ConfirmSaleView extends ConsumerWidget {
                   trailing: TextButton(
                       onPressed: () {
                         ref.watch(confirmSaleProvider.notifier).tryConfirmSale(
-                            staff, barcode, receiverController.text, data);
+                            staff, barcode, '0.0.4353979', data);
                       },
                       child: const Text("Confirm sale")),
                 ));

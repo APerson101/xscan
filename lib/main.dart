@@ -43,6 +43,12 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // return MaterialApp(
+    //     debugShowCheckedModeBanner: false,
+    //     theme: ThemeData().copyWith(
+    //       textTheme: GoogleFonts.alegreyaSansTextTheme(),
+    //     ),
+    //     home: const GenerateBarCode());
     return ref.watch(generatefakeData).when(
         data: (_) {
           var loginState = ref.watch(loginStateProvider);

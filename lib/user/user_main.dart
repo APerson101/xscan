@@ -9,28 +9,31 @@ class UserMain extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: Column(children: [
-        ElevatedButton(
-            onPressed: () async {
-              String barcodeScanRes;
-              try {
-                barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-                    '#ff6666', 'Cancel', false, ScanMode.BARCODE);
+      body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ElevatedButton(
+                onPressed: () async {
+                  String barcodeScanRes;
+                  try {
+                    barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                        '#ff6666', 'Cancel', false, ScanMode.BARCODE);
 
-                if (context.mounted) {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) {
-                    return const ScannedInfo(
-                      barcode: '32f922cd-d304-4c1c-9102-58d68022e94a',
-                    );
-                  }));
-                }
-              } on PlatformException {
-                barcodeScanRes = 'Failed to get platform version.';
-              }
-            },
-            child: const Text("Scan qr code"))
-      ]),
+                    if (context.mounted) {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return const ScannedInfo(
+                          barcode: '143127ce-0214-4d97-b2c3-cbab288ace99',
+                        );
+                      }));
+                    }
+                  } on PlatformException {
+                    barcodeScanRes = 'Failed to get platform version.';
+                  }
+                },
+                child: const Text("Scan qr code"))
+          ]),
     );
   }
 }

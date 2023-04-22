@@ -241,6 +241,7 @@ class DataBase {
         .data;
 
     debugPrint('file content is: $content');
+    return content;
   }
 
   getFileFromBarcode(String barcode) async {

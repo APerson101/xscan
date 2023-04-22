@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../user/user_main.dart';
 import '../providers/login_provider.dart';
 
 class LoginView extends ConsumerWidget {
@@ -16,6 +17,7 @@ class LoginView extends ConsumerWidget {
       if (previous != next) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(next)));
+        ref.watch(_isLoading.notifier).state = false;
       }
     });
     return ref.watch(_animationAssetLoader).when(data: (composition) {
@@ -34,11 +36,14 @@ class LoginView extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       ref.watch(_isLoading) == false
-                          ? Image.asset(
-                              'assets/images/logo.png',
-                              width: 250,
-                              height: 250,
-                              fit: BoxFit.contain,
+                          ? Align(
+                              alignment: Alignment.center,
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                width: 250,
+                                height: 250,
+                                fit: BoxFit.contain,
+                              ),
                             )
                           : Lottie(
                               composition: composition,
@@ -62,8 +67,8 @@ class LoginView extends ConsumerWidget {
                               prefixIcon: const Icon(Icons.email),
                               labelText: 'Enter Email',
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40)))),
-                      const SizedBox(height: 25),
+                                  borderRadius: BorderRadius.circular(15)))),
+                      const SizedBox(height: 50),
                       TextFormField(
                           validator: (password) {
                             if (password != null) {
@@ -78,7 +83,7 @@ class LoginView extends ConsumerWidget {
                           decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.password),
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(3.0),
                                 child: IconButton(
                                     onPressed: () => ref
                                         .watch(_isPasswordObscure.notifier)
@@ -87,8 +92,49 @@ class LoginView extends ConsumerWidget {
                               ),
                               labelText: 'Enter password',
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40)))),
-                      const SizedBox(height: 25),
+                                  borderRadius: BorderRadius.circular(15)))),
+                      const SizedBox(height: 50),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                    MaterialPageRoute(builder: ((context) {
+                                  return const UserMain();
+                                })));
+                              },
+                              child: const Text("Or Click here to scan")),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(child: Container()),
+                          TextButton(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        backgroundColor:
+                                            Colors.blueAccent.shade100,
+                                        // margin: const EdgeInsets.all(8),
+                                        padding: const EdgeInsets.all(8),
+                                        content: ListTile(
+                                          title: const Text("Contact admin"),
+                                          trailing: Lottie.asset(
+                                            'assets/animations/sad.json',
+                                            width: 75,
+                                            height: 75,
+                                            fit: BoxFit.contain,
+                                            animate: true,
+                                            repeat: true,
+                                          ),
+                                        )));
+                              },
+                              child: const Text("Forgot Credentials?"))
+                        ],
+                      ),
+                      const SizedBox(height: 100),
                       ElevatedButton(
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
@@ -99,11 +145,11 @@ class LoginView extends ConsumerWidget {
                         },
                         style: ElevatedButton.styleFrom(
                             maximumSize: Size.infinite,
-                            minimumSize: const Size(150, 50),
+                            minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30))),
+                                borderRadius: BorderRadius.circular(15))),
                         child: const Text("Login"),
-                      )
+                      ),
                     ],
                   ),
                 ),

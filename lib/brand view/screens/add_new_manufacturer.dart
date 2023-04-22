@@ -13,9 +13,16 @@ class AddNewManufacturerView extends ConsumerWidget {
   final quantityController = TextEditingController();
   final selectedManufacturer = StateProvider<Manufacturer?>((ref) => null);
   final selectedProduct = StateProvider<Product?>((ref) => null);
+
   final Brand brand;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final placedText = StateProvider((ref) {
+      var man = ref.read(selectedManufacturer);
+      var item = ref.read(selectedProduct);
+      if (man == null || item == null) return '';
+      return '${man.name} would produce ${quantityController.text} of ${item.name}';
+    });
     ref.listen(sendManuRequestStateProvider, (previous, next) {
       ref.watch(sendManuRequestStateProvider).when(data: (state) {
         if (state == SendManuRequestStateEnum.successful) {
@@ -40,11 +47,15 @@ class AddNewManufacturerView extends ConsumerWidget {
           title: const Text("Add new Manufacturer"),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding:
+              const EdgeInsets.only(left: 15, right: 15, top: 8.0, bottom: 8),
           child: SingleChildScrollView(
             child: Form(
               child: Column(
                 children: [
+                  const SizedBox(
+                    height: 70,
+                  ),
                   ref.watch(getallManufacturersProvider).when(
                       data: (manufacturers) {
                         return DropdownButton<Manufacturer>(
@@ -67,6 +78,9 @@ class AddNewManufacturerView extends ConsumerWidget {
                       error: (er, st) => const Text("Error"),
                       loading: () => const Center(
                           child: CircularProgressIndicator.adaptive())),
+                  const SizedBox(
+                    height: 70,
+                  ),
                   DropdownButton<Product>(
                       value: ref.watch(selectedProduct),
                       hint: const Text("Select product"),
@@ -79,6 +93,9 @@ class AddNewManufacturerView extends ConsumerWidget {
                           ref.watch(selectedProduct.notifier).state = product;
                         }
                       }),
+                  const SizedBox(
+                    height: 70,
+                  ),
                   TextFormField(
                     keyboardType: TextInputType.number,
                     controller: quantityController,
@@ -86,6 +103,13 @@ class AddNewManufacturerView extends ConsumerWidget {
                         labelText: 'Enter quantity to be produced',
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30))),
+                  ),
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  Text(ref.watch(placedText)),
+                  const SizedBox(
+                    height: 100,
                   ),
                   ElevatedButton(
                       onPressed: () {
@@ -103,6 +127,11 @@ class AddNewManufacturerView extends ConsumerWidget {
                             .watch(sendManuRequestStateProvider.notifier)
                             .sendManufacturerRequest(agreement);
                       },
+                      style: ElevatedButton.styleFrom(
+                          maximumSize: Size.infinite,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15))),
                       child: const Text("Create"))
                 ],
               ),

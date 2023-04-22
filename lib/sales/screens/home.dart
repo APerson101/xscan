@@ -23,7 +23,7 @@ class SalesHome extends ConsumerWidget {
                         barcodeScanRes =
                             await FlutterBarcodeScanner.scanBarcode(
                                 '#ff6666', 'Cancel', false, ScanMode.BARCODE);
-                        barcodeScanRes = "32f922cd-d304-4c1c-9102-58d68022e94a";
+                        barcodeScanRes = "143127ce-0214-4d97-b2c3-cbab288ace99";
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
                           return ConfirmSaleView(

@@ -12,10 +12,12 @@ class ScannedInfo extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ref.watch(fetchInfo(barcode)).when(
               data: (data) {
-                return Text(data);
+                return Center(child: Text(data));
               },
               error: (er, st) => const Text("error"),
               loading: () => const CircularProgressIndicator.adaptive())

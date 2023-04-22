@@ -12,10 +12,11 @@ class MainScreenManufacturer extends ConsumerWidget {
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SizedBox.expand(child: _MainBody(id)),
-      bottomNavigationBar: const _BottomNavBar(),
+    return SafeArea(
+      child: Scaffold(
+        body: SizedBox.expand(child: _MainBody(id)),
+        bottomNavigationBar: const _BottomNavBar(),
+      ),
     );
   }
 }
