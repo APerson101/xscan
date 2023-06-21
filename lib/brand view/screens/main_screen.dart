@@ -26,11 +26,7 @@ class MainView extends ConsumerWidget {
       case UserTypesEnum.sales:
         return SalesView(id: FirebaseAuth.instance.currentUser!.uid);
       default:
-        return Center(
-          child: Text(
-            "Failed to Fetch user of type: $userType",
-          ),
-        );
+        return Center(child: Text("Failed to Fetch user of type: $userType"));
     }
   }
 }

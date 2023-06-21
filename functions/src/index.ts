@@ -1,4 +1,6 @@
-import {Client, FileId, PrivateKey, TokenId} from "@hashgraph/sdk";
+import {AccountId, Client, FileId, PrivateKey, TokenId} from "@hashgraph/sdk";
+import * as admin from "firebase-admin";
+import {MulticastMessage} from "firebase-admin/lib/messaging/messaging-api";
 import * as functions from "firebase-functions";
 import * as hash from "./hashgraph/hash";
 // const serviceAccount = require("../keypair.json");
@@ -60,6 +62,40 @@ export const getFileContent = functions.https.onCall(async (req) => {
   const fileId = data.fileId;
   const client = getClient();
   return await hash.retrieveFileContent(client, FileId.fromString(fileId),);
+});
+
+export const sendNotification = functions.https.onCall(async (req) => {
+  const tokens = req.tokens;
+  const message: MulticastMessage = {
+    tokens: tokens,
+    data: req.data
+  }
+  await admin.messaging().sendEachForMulticast(message);
+  return;
+});
+export const transferHbarEscrow = functions.https.onCall(async (req) => {
+  const senderAccountid = req.senderAccountid;
+  const senderPrivateKey = req.senderPrivateKey;
+  const amount = req.amount;
+  return await hash.sendFunds(getClient(),
+    AccountId.fromString(senderAccountid),
+    PrivateKey.fromString(senderPrivateKey),
+    amount,
+    AccountId.fromString(accountID),
+  );
+});
+
+
+
+export const getAccountBalance = functions.https.onCall(async (req) => {
+  const accountID = req.accountID;
+  return await hash.getAccountBalance(getClient(), accountID);
+});
+
+export const approveEscrowTransfer = functions.https.onCall(async (req) => {
+  const receiverAccountID = req.receiverAccountID;
+  return await hash.sendFunds(getClient(), AccountId.fromString(accountID),
+    PrivateKey.fromString(privateKey), req.amount, AccountId.fromString(receiverAccountID));
 });
 // export const deleteuser = functions.https.onCall(async (req) => {
 //   const data = req.data;

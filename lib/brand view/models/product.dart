@@ -1,18 +1,20 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 class Product {
   String name;
   String id;
   String brandOwner;
   String notes;
-  String? imageLink;
+  List<String> imageLink;
   DateTime created;
   Product({
     required this.name,
     required this.id,
     required this.brandOwner,
     required this.notes,
-    this.imageLink,
+    required this.imageLink,
     required this.created,
   });
 
@@ -21,7 +23,7 @@ class Product {
     String? id,
     String? brandOwner,
     String? notes,
-    String? imageLink,
+    List<String>? imageLink,
     DateTime? created,
   }) {
     return Product(
@@ -51,7 +53,7 @@ class Product {
       id: map['id'] ?? '',
       brandOwner: map['brandOwner'] ?? '',
       notes: map['notes'] ?? '',
-      imageLink: map['imageLink'],
+      imageLink: List<String>.from(map['imageLink']),
       created: DateTime.fromMillisecondsSinceEpoch(map['created']),
     );
   }
@@ -75,7 +77,7 @@ class Product {
         other.id == id &&
         other.brandOwner == brandOwner &&
         other.notes == notes &&
-        other.imageLink == imageLink &&
+        listEquals(other.imageLink, imageLink) &&
         other.created == created;
   }
 

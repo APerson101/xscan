@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
+  sdk: '>=3.0.2 <4.0.0'
 
 dependencies:
   flutter:
@@ -27,11 +27,15 @@ dependencies:
   firebase_auth: ^4.3.0
   firebase_storage: ^11.1.1
   cloud_firestore: ^4.5.2
-  shared_preferences: ^2.1.0
+  shared_preferences: ^2.1.2
   isar: ^3.1.0
   isar_flutter_libs: ^3.1.0
   syncfusion_flutter_barcodes: ^21.1.41
   cloud_functions: ^4.1.1
+  path_provider: ^2.0.15
+  # http: ^0.13.6
+  riverpod_annotation: ^2.1.0
+  fluttertoast: ^8.2.2
 
 dev_dependencies:
   flutter_test:
@@ -39,7 +43,6 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   build_runner: ^2.3.3
   riverpod_generator: ^2.2.0
-  riverpod_annotation: ^2.1.0
   isar_generator: ^3.1.0
 
 

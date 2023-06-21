@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
 import 'package:xscan/brand%20view/models/product.dart';
+import 'package:xscan/brand%20view/providers/login_provider.dart';
 
 import '../providers/create_product_provider.dart';
 
@@ -15,15 +16,13 @@ class AddNewProductView extends ConsumerWidget {
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
   final selectedManufacturer = StateProvider((ref) => 0);
-  final selectedImage = StateProvider<XFile?>((ref) => null);
+  final selectedImage = StateProvider<List<XFile>?>((ref) => null);
   final Brand brand;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    pickImage() async {
-      var img = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (img != null) {
-        ref.watch(selectedImage.notifier).state = img;
-      }
+    pickImages() async {
+      var img = await ImagePicker().pickMultiImage();
+      ref.watch(selectedImage.notifier).update((state) => state = [...img]);
     }
 
     ref.listen(productCreationStateProvider, (previous, next) {
@@ -34,11 +33,14 @@ class AddNewProductView extends ConsumerWidget {
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Succesfully created")));
             Navigator.of(context).pop();
+            ref.invalidate(loginStateProvider);
             break;
+
           default:
             null;
         }
       }, error: (Object error, StackTrace stackTrace) {
+        debugPrintStack(stackTrace: stackTrace);
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("failed to create")));
       }, loading: () {
@@ -73,22 +75,28 @@ class AddNewProductView extends ConsumerWidget {
                   ref.watch(selectedImage) == null
                       ? ElevatedButton(
                           onPressed: () async {
-                            await pickImage();
+                            await pickImages();
                           },
-                          child: const Text("select Image"))
-                      : Row(children: [
-                          ElevatedButton(
-                              onPressed: () async {
-                                await pickImage();
-                              },
-                              child: const Text("ChangeImage")),
-                          Image.file(
-                            File(ref.watch(selectedImage)!.path),
-                            width: 250,
-                            height: 250,
-                            fit: BoxFit.contain,
-                          )
-                        ]),
+                          child: const Text("select Images"))
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(children: [
+                            ElevatedButton(
+                                onPressed: () async {
+                                  await pickImages();
+                                },
+                                child: const Text("Change Selection")),
+                            ...ref
+                                .watch(selectedImage)!
+                                .map((e) => Image.file(
+                                      File(e.path),
+                                      width: 250,
+                                      height: 250,
+                                      fit: BoxFit.contain,
+                                    ))
+                                .toList()
+                          ]),
+                        ),
                   DropdownButton<int>(
                       value: ref.watch(selectedManufacturer),
                       items: [
@@ -111,13 +119,14 @@ class AddNewProductView extends ConsumerWidget {
                           created: DateTime.now(),
                           brandOwner: brand.name,
                           id: const Uuid().v4().toString(),
-                          imageLink: '',
+                          imageLink: [],
                           name: productNameController.text,
-                          notes: '',
+                          notes: productDescriptionController.text,
                         );
                         ref
                             .watch(productCreationStateProvider.notifier)
-                            .createProduct(product, brand.id);
+                            .createProduct(
+                                product, brand, ref.watch(selectedImage)!);
                       },
                       child: const Text("Create new Product"))
                 ],

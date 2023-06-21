@@ -7,7 +7,7 @@ part of 'manu_providers.dart';
 // **************************************************************************
 
 String _$manuApprovePendingHash() =>
-    r'f2e442f780d068c2022c79153fbeb383f249f076';
+    r'c2aee91e93aa4ef2b0daccd6597ed7bfa1459496';
 
 /// See also [ManuApprovePending].
 @ProviderFor(ManuApprovePending)

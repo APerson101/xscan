@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
 import 'package:xscan/brand%20view/models/brand_manufacturer.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
@@ -14,15 +19,23 @@ import 'package:xscan/manufacturer/models/employee.dart';
 import 'package:xscan/manufacturer/models/file.dart';
 import 'package:xscan/sales/models/sales_model.dart';
 
+import '../../manufacturer/models/quotation.dart';
 import '../../sales/models/transfermode.dart';
 import '../../worker/models/scanmodel.dart';
+import '../models/escrow.dart';
 import '../models/manufacturer_summart.dart';
 
 class DataBase {
   var get = GetIt.I;
-  FirebaseFirestore store = FirebaseFirestore.instance;
-  FirebaseAuth auth = FirebaseAuth.instance;
-  FirebaseFunctions functions = FirebaseFunctions.instance;
+  FirebaseFirestore store;
+  FirebaseAuth auth;
+  FirebaseFunctions functions;
+  FirebaseStorage storage;
+  DataBase(
+      {required this.store,
+      required this.auth,
+      required this.functions,
+      required this.storage});
 
   getNumberOfVerifications(String brandID) async {
     var docs = (await store
@@ -141,6 +154,9 @@ class DataBase {
   }
 
   createEmployees(String id, Employee emp) async {
+    var id = await createFakeUser(emp.email, emp.password);
+    emp.id = id;
+    await storeFakeUser(id, 'employee');
     await store.doc('employees/$id').set(emp.toMap());
   }
 
@@ -302,10 +318,10 @@ class DataBase {
     debugPrint('nft ownership transfer status: $data');
   }
 
-  Future<Map<String, dynamic>> createAccount() async {
+  Future<(String, String)> createAccount() async {
     var data = (await functions.httpsCallable('createAccount').call({})).data;
     debugPrint('newly created account details is: $data');
-    return data;
+    return (data['accountID'] as String, data['privateKey'] as String);
   }
 
   Future<List<Employee>> getEmployees({required String manufacturerID}) async {
@@ -413,15 +429,46 @@ class DataBase {
     await functions.httpsCallable('deleteuser').call({'data': id});
   }
 
-  addProduct(Product newProduct, String brandID) async {
+  addProduct(Product newProduct, Brand brand, List<XFile> images) async {
     var doc = (await store
             .collection('brands')
-            .where('id', isEqualTo: brandID)
+            .where('id', isEqualTo: brand.id)
             .limit(1)
             .get())
         .docs[0];
     var id = doc.id;
-    (await store.doc('brands/$id').update({'catalog': newProduct.toMap()}));
+    debugPrint(id);
+    // var urls = await saveImages(images, brand, newProduct.id);
+    // save images to database
+    (await store.doc('brands/$id').update({
+      'catalog': [
+        newProduct
+            // ..imageLink = ['urls']
+            .toMap()
+      ]
+    }));
+  }
+
+  saveImages(List<XFile> imageLinks, Brand brand, String productID) async {
+    var storageRef = storage.ref();
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    List<String> urls = [];
+    imageLinks.map((link) async {
+      String filePath = '${appDocDir.absolute}/${link.name}';
+      File file = File(filePath);
+//
+      final imageRef = storageRef.child(link.name);
+      await imageRef.putFile(
+          file,
+          SettableMetadata(contentType: "image/jpeg", customMetadata: {
+            'brandID': brand.id,
+            'productId': productID,
+            'brandName': brand.name
+          }));
+      var url = await imageRef.getDownloadURL();
+      urls.add(url);
+    });
+    return urls;
   }
 
   removeProduct(Brand brand, String productID, String brandID) async {
@@ -712,7 +759,48 @@ class DataBase {
   saveTransfer(Transfer transfer) async {
     (await store.collection('transfers').add(transfer.toMap()));
   }
-}
 
+  sendFundsEscrow(
+      String senderAccountId, String senderPrivateKey, int amount) async {
+    var res = await functions.httpsCallable('transferHbarEscrow').call({
+      'senderAccountid': senderAccountId,
+      'senderPrivateKey': senderPrivateKey,
+      'amount': amount
+    });
+    debugPrint(res.data);
+  }
+
+  saveEscrowToHistory(Escrow escrow) async {
+    await store.doc('escrows/${escrow.id}').set(escrow.toMap());
+  }
+
+  approveEscrow(Escrow escrow) async {
+    escrow.status = EscrowStatusEnum.approved;
+    await store.doc('escrows/${escrow.id}').update(escrow.toMap());
+    var res = await functions.httpsCallable('approveEscrowTransfer').call({
+      'receiverAccountID': escrow.receiverAccountID,
+      'amount': escrow.amount
+    });
+    debugPrint(res.data);
+  }
+
+  sendQuotation(QuotationModel quotationmodel) async {
+    (await store.collection('quotations').add(quotationmodel.toMap()));
+  }
+
+  loadBrandNotifications({required String id}) async {
+    var docs = (await store
+            .collection('quotations')
+            .where('brandID', isEqualTo: id)
+            .get())
+        .docs;
+    List<QuotationModel> allQuotes = [];
+    for (var doc in docs) {
+      allQuotes.add(QuotationModel.fromMap(doc.data()));
+    }
+
+    return allQuotes;
+  }
+}
   // maybe: Retrieve NFT
 

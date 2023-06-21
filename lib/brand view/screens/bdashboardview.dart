@@ -100,6 +100,7 @@ class _ActionButtons extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(15)),
                     child: const Center(child: Text("Request Manufacturer")))),
           ),
+
           // ElevatedButton(
           //     onPressed: () async {
           //       var db = GetIt.I<DataBase>();

@@ -7,6 +7,9 @@ class Brand {
   String name;
   String id;
   String location;
+  String phone;
+  String address;
+  String email;
   DateTime created;
   String privateKey;
   String accountID;
@@ -15,6 +18,9 @@ class Brand {
     required this.name,
     required this.id,
     required this.location,
+    required this.phone,
+    required this.address,
+    required this.email,
     required this.created,
     required this.privateKey,
     required this.accountID,
@@ -25,6 +31,9 @@ class Brand {
     String? name,
     String? id,
     String? location,
+    String? phone,
+    String? address,
+    String? email,
     DateTime? created,
     String? privateKey,
     String? accountID,
@@ -34,6 +43,9 @@ class Brand {
       name: name ?? this.name,
       id: id ?? this.id,
       location: location ?? this.location,
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
+      email: email ?? this.email,
       created: created ?? this.created,
       privateKey: privateKey ?? this.privateKey,
       accountID: accountID ?? this.accountID,
@@ -46,6 +58,9 @@ class Brand {
       'name': name,
       'id': id,
       'location': location,
+      'phone': phone,
+      'address': address,
+      'email': email,
       'created': created.millisecondsSinceEpoch,
       'privateKey': privateKey,
       'accountID': accountID,
@@ -58,6 +73,9 @@ class Brand {
       name: map['name'] ?? '',
       id: map['id'] ?? '',
       location: map['location'] ?? '',
+      phone: map['phone'] ?? '',
+      address: map['address'] ?? '',
+      email: map['email'] ?? '',
       created: DateTime.fromMillisecondsSinceEpoch(map['created']),
       privateKey: map['privateKey'] ?? '',
       accountID: map['accountID'] ?? '',
@@ -72,7 +90,7 @@ class Brand {
 
   @override
   String toString() {
-    return 'Brand(name: $name, id: $id, location: $location, created: $created, privateKey: $privateKey, accountID: $accountID, catalog: $catalog)';
+    return 'Brand(name: $name, id: $id, location: $location, phone: $phone, address: $address, email: $email, created: $created, privateKey: $privateKey, accountID: $accountID, catalog: $catalog)';
   }
 
   @override
@@ -83,6 +101,9 @@ class Brand {
         other.name == name &&
         other.id == id &&
         other.location == location &&
+        other.phone == phone &&
+        other.address == address &&
+        other.email == email &&
         other.created == created &&
         other.privateKey == privateKey &&
         other.accountID == accountID &&
@@ -94,6 +115,9 @@ class Brand {
     return name.hashCode ^
         id.hashCode ^
         location.hashCode ^
+        phone.hashCode ^
+        address.hashCode ^
+        email.hashCode ^
         created.hashCode ^
         privateKey.hashCode ^
         accountID.hashCode ^

@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:xscan/brand%20view/models/brand.dart';
 import 'package:xscan/brand%20view/models/product.dart';
 
 import '../helpers/db.dart';
@@ -15,10 +17,10 @@ class ProductCreationState extends _$ProductCreationState {
     return ProductCreationStateEnum.idle;
   }
 
-  createProduct(Product product, String brandID) async {
+  createProduct(Product product, Brand brand, List<XFile> files) async {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
-      await db.addProduct(product, brandID);
+      await db.addProduct(product, brand, files);
       // return Future.delayed(const Duration(seconds: 2), () {
       //   var type =
       //       Random.secure().nextInt(ProductCreationStateEnum.values.length);

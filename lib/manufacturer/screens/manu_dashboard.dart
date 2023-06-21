@@ -23,12 +23,12 @@ class ManuDashboard extends ConsumerWidget {
               right: 0,
               height: 75,
               child: _ActionButtons(data)),
-          Positioned(
+          const Positioned(
               left: 0,
               right: 0,
               top: 100,
               child: Row(
-                children: const [
+                children: [
                   Expanded(child: Divider()),
                   Text("Your company summary"),
                   Expanded(child: Divider()),
@@ -40,12 +40,12 @@ class ManuDashboard extends ConsumerWidget {
               right: 0,
               height: 330,
               child: _StatisticsView(data)),
-          Positioned(
+          const Positioned(
               left: 0,
               right: 0,
               top: 460,
               child: Row(
-                children: const [
+                children: [
                   Expanded(child: Divider()),
                   Text("Most recently Scanned"),
                   Expanded(child: Divider()),

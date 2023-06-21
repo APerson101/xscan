@@ -26,6 +26,7 @@ class TestPageView extends ConsumerWidget {
                 child: const Text("Insha Allah this would work first try")),
             ElevatedButton(
                 onPressed: () async {
+                  /*
                   var businessaccount =
                       await GetIt.I<DataBase>().createAccount();
                   var businessID = businessaccount['accountID'];
@@ -40,17 +41,18 @@ class TestPageView extends ConsumerWidget {
                   var manufacturerAccount =
                       await GetIt.I<DataBase>().createAccount();
                   var manuID = receiverAccount['accountID'];
-                  var manuKey = receiverAccount['privateKey'];
+                  var manuKey = receiverAccount['privateKey'];*/
 
                   // var fileID = await GetIt.I<DataBase>()
                   //     .saveUpdateToFile(manuKey, 'filecreatedsaved,');
                   // await GetIt.I<DataBase>()
                   //     .appendFile(manuKey, fileID, 'manuUpdated,');
                   // await GetIt.I<DataBase>().getFileContent(fileID);
-                  var nftID = await GetIt.I<DataBase>()
+
+                  /*  var nftID = await GetIt.I<DataBase>()
                       .createNFTReceipt('brand1', 'BND1', senderID);
                   await GetIt.I<DataBase>().transferNFTOwnership(
-                      nftID, senderID, receiverID, senderKey);
+                      nftID, senderID, receiverID, senderKey);*/
                 },
                 child: const Text("Hedera stuff"))
           ]),

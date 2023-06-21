@@ -1,4 +1,4 @@
-import {AccountCreateTransaction, AccountId, Client, FileAppendTransaction, FileContentsQuery, FileCreateTransaction, FileId, Hbar, PrivateKey, TokenCreateTransaction, TokenId, TokenSupplyType, TokenType, TransferTransaction} from "@hashgraph/sdk";
+import {AccountBalanceQuery, AccountCreateTransaction, AccountId, Client, FileAppendTransaction, FileContentsQuery, FileCreateTransaction, FileId, Hbar, PrivateKey, TokenCreateTransaction, TokenId, TokenSupplyType, TokenType, TransferTransaction} from "@hashgraph/sdk";
 import * as dotenv from "dotenv";
 
 dotenv.config({path: "../.env"});
@@ -93,6 +93,26 @@ export async function retrieveFileContent(client: Client, fileId: FileId) {
     .setFileId(fileId);
   const contents = await query.execute(client);
   return contents.toString();
+}
+
+export async function sendFunds(client: Client, senderAccountid: AccountId,
+  senderPrivateKey: PrivateKey, amount: number, receiverAccountID: AccountId) {
+  var receipt = await (await (await new TransferTransaction()
+    .addHbarTransfer(senderAccountid, Hbar.fromTinybars(-amount))
+    .addHbarTransfer(receiverAccountID, Hbar.fromTinybars(amount))
+    .freezeWith(client)
+    .sign(senderPrivateKey))
+    .execute(client)).getReceipt(client);
+  console.log(`sending funds from ${senderAccountid} to ${receiverAccountID} is ${receipt.status}`);
+  return receipt.status;
+}
+
+
+export async function getAccountBalance(client: Client, accountID: AccountId) {
+  const accountBalance = await new AccountBalanceQuery()
+    .setAccountId(accountID)
+    .execute(client);
+  return accountBalance.hbars.toTinybars();
 }
 
 // async function main() {

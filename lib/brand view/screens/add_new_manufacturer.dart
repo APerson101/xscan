@@ -13,15 +13,14 @@ class AddNewManufacturerView extends ConsumerWidget {
   final quantityController = TextEditingController();
   final selectedManufacturer = StateProvider<Manufacturer?>((ref) => null);
   final selectedProduct = StateProvider<Product?>((ref) => null);
-
   final Brand brand;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final placedText = StateProvider((ref) {
-      var man = ref.read(selectedManufacturer);
-      var item = ref.read(selectedProduct);
-      if (man == null || item == null) return '';
-      return '${man.name} would produce ${quantityController.text} of ${item.name}';
+      var manufacturer = ref.watch(selectedManufacturer);
+      var item = ref.watch(selectedProduct);
+      if (manufacturer == null || item == null) return '';
+      return '${manufacturer.name} would produce ${quantityController.text} quantities of ${item.name}';
     });
     ref.listen(sendManuRequestStateProvider, (previous, next) {
       ref.watch(sendManuRequestStateProvider).when(data: (state) {
@@ -58,7 +57,10 @@ class AddNewManufacturerView extends ConsumerWidget {
                   ),
                   ref.watch(getallManufacturersProvider).when(
                       data: (manufacturers) {
-                        return DropdownButton<Manufacturer>(
+                        return DropdownButtonFormField<Manufacturer>(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20))),
                             value: ref.watch(selectedManufacturer),
                             hint: const Text("Select manufacturer"),
                             items: [
@@ -81,7 +83,10 @@ class AddNewManufacturerView extends ConsumerWidget {
                   const SizedBox(
                     height: 70,
                   ),
-                  DropdownButton<Product>(
+                  DropdownButtonFormField<Product>(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20))),
                       value: ref.watch(selectedProduct),
                       hint: const Text("Select product"),
                       items: brand.catalog.map((index) {
@@ -99,6 +104,7 @@ class AddNewManufacturerView extends ConsumerWidget {
                   TextFormField(
                     keyboardType: TextInputType.number,
                     controller: quantityController,
+                    onChanged: (_) => ref.invalidate(placedText),
                     decoration: InputDecoration(
                         labelText: 'Enter quantity to be produced',
                         border: OutlineInputBorder(

@@ -60,11 +60,43 @@ class ManuNotifications extends ConsumerWidget {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      ref
-                          .watch(acceptOfferProvider.notifier)
-                          .acceptOffer(e.id, e.product, e.manufacturerID);
+                      var amountText = TextEditingController();
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Material(
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                      height: 200,
+                                      width: 200,
+                                      child: TextFormField(
+                                        controller: amountText,
+                                        decoration: InputDecoration(
+                                            labelText: 'Enter amount',
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20))),
+                                      )),
+                                  ElevatedButton(
+                                      onPressed: () async {
+                                        ref.watch(sendQuotationProvider(
+                                            int.parse(amountText.text),
+                                            e.brandID,
+                                            data,
+                                            e));
+                                      },
+                                      child: const Text("confirm"))
+                                ],
+                              ),
+                            );
+                          });
+
+                      // ref
+                      //     .watch(acceptOfferProvider.notifier)
+                      //     .acceptOffer(e.id, e.product, e.manufacturerID);
                     },
-                    child: const Text("Accept proposal"))
+                    child: const Text("Send  quotation"))
               ],
             );
           }).toList(),

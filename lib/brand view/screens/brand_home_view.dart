@@ -5,6 +5,7 @@ import 'package:xscan/brand%20view/screens/products_view.dart';
 import 'package:xscan/brand%20view/screens/profile_view.dart';
 
 import 'bdashboardview.dart';
+import 'brand_notifications_view.dart';
 
 class BrandHomeView extends ConsumerWidget {
   const BrandHomeView({super.key, required this.id});
@@ -33,6 +34,8 @@ class _CurrentView extends ConsumerWidget {
         case 1:
           return ProductsView(brand: brand);
         case 2:
+          return BrandNotificationsView(brand: brand);
+        case 3:
           return ProfileView(brand: brand);
         default:
           return const Placeholder();
@@ -73,6 +76,10 @@ class BrandBottomNavBar extends ConsumerWidget {
             case _BottomNavBarItems.products:
               icon = Icons.adjust;
               label = 'Products';
+
+            case _BottomNavBarItems.notifications:
+              icon = Icons.notifications;
+              label = 'Notifications';
               break;
           }
           return BottomNavigationBarItem(icon: Icon(icon), label: label);
@@ -80,6 +87,6 @@ class BrandBottomNavBar extends ConsumerWidget {
   }
 }
 
-enum _BottomNavBarItems { dashboard, products, profile }
+enum _BottomNavBarItems { dashboard, products, notifications, profile }
 
-final _brandDashboardcurrentIndex = StateProvider((ref) => 0);
+final _brandDashboardcurrentIndex = StateProvider.autoDispose((ref) => 0);

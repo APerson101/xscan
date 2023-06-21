@@ -2,38 +2,36 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/helpers/db.dart';
-import 'package:xscan/brand%20view/models/brand.dart';
-import 'package:xscan/brand%20view/models/product.dart';
-import 'package:xscan/sales/models/sales_model.dart';
 
-import 'brand view/models/manufacturer.dart';
 import 'brand view/providers/login_provider.dart';
 import 'brand view/screens/login_view.dart';
 import 'brand view/screens/main_screen.dart';
 import 'firebase_options.dart';
-import 'manufacturer/models/employee.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  GetIt.I.registerSingleton<DataBase>(DataBase());
-  // FirebaseFirestore.instance.settings = const Settings(
-  //     host: '192.168.8.100:8080', sslEnabled: false, persistenceEnabled: false);
+  await FirebaseAuth.instance.useAuthEmulator('192.168.8.100', 9099);
+  await FirebaseStorage.instance.useStorageEmulator('192.168.8.100', 9199);
+  FirebaseFirestore.instance.settings = const Settings(
+      host: '192.168.1.43:8080', sslEnabled: false, persistenceEnabled: false);
+  GetIt.I.registerSingleton<FirebaseStorage>(FirebaseStorage.instance);
   GetIt.I.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
-  GetIt.I.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
-  GetIt.I.registerSingleton<FirebaseFunctions>(FirebaseFunctions.instance);
-  // GetIt.I.registerSingleton<FirebaseAuth>(
-  //     FirebaseAuth.instance..useAuthEmulator('192.168.8.100', 9099));
-  // GetIt.I.registerSingleton<FirebaseFirestore>(
-  //     FirebaseFirestore.instance..useFirestoreEmulator('192.168.8.100', 8080));
-  // GetIt.I.registerSingleton<FirebaseFunctions>(
-  //     FirebaseFunctions.instance..useFunctionsEmulator('192.168.8.100', 5001));
+  GetIt.I.registerSingleton<FirebaseFirestore>(
+      FirebaseFirestore.instance..useFirestoreEmulator('192.168.8.100', 8080));
+  GetIt.I.registerSingleton<FirebaseFunctions>(
+      FirebaseFunctions.instance..useFunctionsEmulator('192.168.8.100', 5001));
+  GetIt.I.registerSingleton<DataBase>(DataBase(
+      auth: GetIt.I<FirebaseAuth>(),
+      functions: GetIt.I<FirebaseFunctions>(),
+      storage: GetIt.I<FirebaseStorage>(),
+      store: GetIt.I<FirebaseFirestore>()));
 
   runApp(const ProviderScope(child: MainApp()));
 }
@@ -49,44 +47,37 @@ class MainApp extends ConsumerWidget {
     //       textTheme: GoogleFonts.alegreyaSansTextTheme(),
     //     ),
     //     home: const GenerateBarCode());
-    return ref.watch(generatefakeData).when(
-        data: (_) {
-          var loginState = ref.watch(loginStateProvider);
 
-          Widget view = Container();
-          return loginState.when(data: (state) {
-            switch (state) {
-              case LoginStateEnum.loggedOut:
-                view = LoginView();
-                break;
-              case LoginStateEnum.signedIn:
-                view = const MainView();
-                break;
-            }
-            return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData().copyWith(
-                  textTheme: GoogleFonts.alegreyaSansTextTheme(),
-                ),
-                home: view);
-            // home: view);
-          }, error: (Object error, StackTrace stackTrace) {
-            return const Center(child: Text("error loading login"));
-          }, loading: () {
-            return Container();
-          });
-        },
-        error: (er, st) => const MaterialApp(
-            home: Center(child: Text("Failed to do the thing"))),
-        loading: () => const Material(
-                child: Center(
-              child: CircularProgressIndicator.adaptive(),
-            )));
+    var loginState = ref.watch(loginStateProvider);
+
+    Widget view = Container();
+    return loginState.when(data: (state) {
+      switch (state) {
+        case LoginStateEnum.loggedOut:
+          view = LoginView();
+          break;
+        case LoginStateEnum.signedIn:
+          view = const MainView();
+          break;
+      }
+      return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData().copyWith(
+            textTheme: GoogleFonts.alegreyaSansTextTheme(),
+          ),
+          home: Scaffold(body: view));
+    }, error: (Object error, StackTrace stackTrace) {
+      return const MaterialApp(
+          home: Scaffold(body: Center(child: Text("error loading login"))));
+    }, loading: () {
+      return Container();
+    });
   }
 }
 
 final generatefakeData = FutureProvider((ref) async {
   return;
+  /*
   var db = GetIt.I<DataBase>();
 // create brand and account
 
@@ -106,6 +97,7 @@ final generatefakeData = FutureProvider((ref) async {
           id: const Uuid().v4().toString(),
           brandOwner: 'JK vison',
           notes: 'sample notes',
+          imageLink: [],
           created: DateTime.now()));
   var brand = Brand(
       name: 'JK vison',
@@ -154,4 +146,6 @@ final generatefakeData = FutureProvider((ref) async {
           brandName: 'JK vison',
           privateKey: spk,
           accountID: saccID));
+
+          */
 });

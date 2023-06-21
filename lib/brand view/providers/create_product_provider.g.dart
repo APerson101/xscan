@@ -7,7 +7,7 @@ part of 'create_product_provider.dart';
 // **************************************************************************
 
 String _$productCreationStateHash() =>
-    r'4105adf8e0f257f50aa93c702d8c1f3480ebd98f';
+    r'66d610901e2573f6ab6b8d797b6e8b28c781c540';
 
 /// See also [ProductCreationState].
 @ProviderFor(ProductCreationState)

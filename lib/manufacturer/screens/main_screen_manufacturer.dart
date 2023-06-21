@@ -34,9 +34,9 @@ class _MainBody extends ConsumerWidget {
         case 1:
           return ManuNotifications(data: data);
         case 2:
-          return ManuProfile(data: data);
-        case 3:
           return PeopleView(data: data);
+        case 3:
+          return ManuProfile(data: data);
         default:
           return const Placeholder();
       }
