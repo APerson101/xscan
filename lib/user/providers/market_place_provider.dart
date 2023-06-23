@@ -1,8 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:xscan/brand%20view/helpers/db.dart';
+import 'package:xscan/brand%20view/helpers/db2.dart';
 
+import '../../brand view/models/transfer.dart';
 import '../../brand view/models/txns_history.dart';
+import '../../brand view/models/usermodel.dart';
 
 part 'market_place_provider.g.dart';
 
@@ -60,4 +63,21 @@ class MarketPlace extends _$MarketPlace {
               itemBarcode: "7831-5345-3453"
             ));
   }
+}
+
+@riverpod
+FutureOr<UserModel> getUserFromId(GetUserFromIdRef ref, String id) async {
+  return await GetIt.I<DataBase>().getUserFromID(id);
+}
+
+@riverpod
+FutureOr<List<NftInfo>> loadUserAssets(LoadUserAssetsRef ref) async {
+  return await GetIt.I<BaseHelper>().getNFTData(['0.0.14972043']);
+}
+
+@riverpod
+FutureOr putAssetForSale(
+    PutAssetForSaleRef ref, UserModel model, int amount, String barcode) async {
+  await GetIt.I<DataBase>()
+      .addItemforSale(barcode: barcode, price: amount, seller: model.accountID);
 }

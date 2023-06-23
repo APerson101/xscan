@@ -7,9 +7,23 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
+import 'package:xscan/brand%20view/models/brand.dart';
+import 'package:xscan/brand%20view/models/transfer.dart';
+
+import '../../worker/models/scanmodel.dart';
+import '../models/txns_history.dart';
+import 'db.dart';
 
 typedef BalanceResponse = ({int hbar, TokensType tokens});
 typedef TokensType = List<({String tokenId, int balance})>;
+typedef NftInfo = ({
+  List<String> imageLinks,
+  String review,
+  List<int> stars,
+  String productName,
+  Transfer tranfer,
+  ItemOwnershipHistory ownership
+});
 
 class BaseHelper {
   var get = GetIt.I;
@@ -36,6 +50,46 @@ class BaseHelper {
       dym.add((balance: item['balance'], tokenId: item['token_id']));
     }
     return (hbar: hbar, tokens: dym);
+  }
+
+  Future<List<NftInfo>> getNFTData(List<String> nfts) async {
+    List<NftInfo> all = [];
+
+    for (var nft in nfts) {
+      var ss = (await store
+              .collection('transfers')
+              .where('receiptID', isEqualTo: nft)
+              .limit(1)
+              .get())
+          .docs[0]
+          .data();
+      var txn = Transfer.fromMap(ss);
+
+      var imageLinks = Brand.fromMap((await store
+              .collection('brands')
+              .where('id', isEqualTo: txn.brandID)
+              .limit(1)
+              .get())
+          .docs[0]
+          .data());
+
+      var scanned = ScanModel.fromMap(
+          (await store.doc('barcodes/${txn.barcodeID}').get()).data()!);
+      var ownership = await GetIt.I<DataBase>().getOwnership(txn.barcodeID);
+
+      all.add((
+        imageLinks: imageLinks.catalog
+            .firstWhere((element) => element.id == txn.productID)
+            .imageLink,
+        review: '',
+        stars: [4, 3, 5, 6, 7],
+        productName: scanned.productName!,
+        tranfer: txn,
+        ownership: ownership
+      ));
+      //   // images, leave a review, comments, product name, brand id, date acquired, ownership history
+    }
+    return all;
   }
 }
 

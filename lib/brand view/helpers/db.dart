@@ -592,8 +592,39 @@ class DataBase {
         .update({'approved': FieldValue.increment(1)}));
   }
 
-  getOwnership(String barcode) async {
+  Future<ItemOwnershipHistory> getOwnership(String barcode) async {
     // get ownership of NFT
+    ItemOwnershipHistory ownership;
+
+    var ownerFirst = Transfer.fromMap((await store
+            .collection('transfers')
+            .where('barcodeID', isEqualTo: barcode)
+            .limit(1)
+            .get())
+        .docs[0]
+        .data());
+    //get onwership history of barcode
+    var resoldDocs =
+        (await store.collection('resold/$barcode/sales').get()).docs;
+    List<Owner> owners = [
+      Owner(
+          accountID: ownerFirst.receiverAddress,
+          amountPaid: ownerFirst.cost.toString(),
+          purchased: ownerFirst.time)
+    ];
+    var brandId = '';
+    for (var resoldItem in resoldDocs) {
+      // convert to object
+      var txn = Transfer.fromMap(resoldItem.data());
+      brandId = txn.brandID;
+      owners.add(Owner(
+          accountID: txn.receiverAddress,
+          amountPaid: txn.cost.toString(),
+          purchased: txn.time));
+    }
+    ownership = ItemOwnershipHistory(
+        id: '', barcode: barcode, brandID: brandId, owners: owners);
+    return ownership;
   }
 
   getAllOwnership(String brandID) async {
@@ -869,7 +900,7 @@ class DataBase {
 
   addItemforSale(
       {required String barcode,
-      required double price,
+      required int price,
       required String seller}) async {
     (await store
         .collection("market")
@@ -900,7 +931,7 @@ class DataBase {
     for (var doc in allBarcodesForSaleDocs) {
       sellers.add(doc.get('seller'));
       allBarcodes.add(doc.get('barcode'));
-      prices.add(doc.get('price'));
+      prices.add(int.parse(doc.get('price').toString()));
     }
 
     List<ItemForSale> forSale = [];
@@ -913,35 +944,7 @@ class DataBase {
           ScanModel.fromMap((await store.doc('barcodes/$code').get()).data()!);
       productID = scanned.productID!;
       productName = scanned.productName!;
-      //get original owner
-      var ownerFirst = Transfer.fromMap((await store
-              .collection('transfers')
-              .where('barcodeID', isEqualTo: code)
-              .limit(1)
-              .get())
-          .docs[0]
-          .data());
-      //get onwership history of barcode
-      var resoldDocs =
-          (await store.collection('resold/$code/sales').get()).docs;
-      List<Owner> owners = [
-        Owner(
-            accountID: ownerFirst.receiverAddress,
-            amountPaid: ownerFirst.cost.toString(),
-            purchased: ownerFirst.time)
-      ];
-      var brandId = '';
-      for (var resoldItem in resoldDocs) {
-        // convert to object
-        var txn = Transfer.fromMap(resoldItem.data());
-        brandId = txn.brandID;
-        owners.add(Owner(
-            accountID: txn.receiverAddress,
-            amountPaid: txn.cost.toString(),
-            purchased: txn.time));
-      }
-      ownership = ItemOwnershipHistory(
-          id: '', barcode: code, brandID: brandId, owners: owners);
+      ownership = await getOwnership(code);
       forSale.add((
         productImages: [],
         productID: productID,
@@ -954,6 +957,16 @@ class DataBase {
       ));
     }
     return forSale;
+  }
+
+  getUserFromID(String id) async {
+    return UserModel.fromMap((await store
+            .collection('appusers')
+            .where('id', isEqualTo: id)
+            .limit(1)
+            .get())
+        .docs[0]
+        .data());
   }
 }
   // maybe: Retrieve NFT

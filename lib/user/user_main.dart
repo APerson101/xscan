@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xscan/user/market_place_view.dart';
+import 'package:xscan/user/user_assets.dart';
 import 'package:xscan/user/user_dashboard.dart';
 
 class UserMain extends ConsumerWidget {
@@ -23,6 +24,7 @@ class UserMain extends ConsumerWidget {
         body: switch (ref.watch(_selectedIndex)) {
           0 => const UserDashboard(),
           1 => const MarketPlaceView(),
+          2 => UserAssets(id: id),
           _ => Container()
         });
   }
@@ -31,6 +33,7 @@ class UserMain extends ConsumerWidget {
 enum UserNavBar {
   dashboard('dashboard', Icon(Icons.dashboard)),
   marketplace('market', Icon(Icons.shop)),
+  assets('assets', Icon(Icons.receipt)),
   profile('profile', Icon(Icons.person));
 
   final String label;

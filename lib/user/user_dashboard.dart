@@ -18,8 +18,9 @@ class UserDashboard extends ConsumerWidget {
         children: [
           ElevatedButton(
               onPressed: () async {
-                await GetIt.I<BaseHelper>()
-                    .retreiveNFT(accountID: '0.0.14962704');
+                ref.watch(userBalancesProvider.notifier).state =
+                    await GetIt.I<BaseHelper>()
+                        .retreiveBalance(accountID: '0.0.14962704');
               },
               child: const Text("Retrive Balance")),
           ElevatedButton(
@@ -50,3 +51,5 @@ class UserDashboard extends ConsumerWidget {
         ]);
   }
 }
+
+final userBalancesProvider = StateProvider<BalanceResponse?>((ref) => null);

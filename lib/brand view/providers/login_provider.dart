@@ -30,10 +30,6 @@ class LoginState extends _$LoginState {
           ref.watch(loginMessage.notifier).state = 'Invalid Details';
           return LoginStateEnum.loggedOut;
         }
-
-        // var type = Random.secure().nextInt(LoginStateEnum.values.length);
-        // debugPrint(describeEnum(LoginStateEnum.values[type]));
-        // return LoginStateEnum.signedIn;
       });
     });
   }
