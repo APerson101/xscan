@@ -9,6 +9,7 @@ class ConfirmSaleView extends ConsumerWidget {
   final SalesModel staff;
   final String barcode;
   final receiverController = TextEditingController();
+  final costController = TextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(confirmSaleProvider, (previous, next) {
@@ -30,6 +31,14 @@ class ConfirmSaleView extends ConsumerWidget {
           TextFormField(
             controller: receiverController,
             decoration: InputDecoration(
+                hintText: 'enter receiver',
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30))),
+          ),
+          TextFormField(
+            controller: costController,
+            decoration: InputDecoration(
+                hintText: 'enter cost',
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30))),
           ),
@@ -42,7 +51,11 @@ class ConfirmSaleView extends ConsumerWidget {
                   trailing: TextButton(
                       onPressed: () {
                         ref.watch(confirmSaleProvider.notifier).tryConfirmSale(
-                            staff, barcode, '0.0.4353979', data);
+                            staff,
+                            barcode,
+                            '0.0.14962704',
+                            data,
+                            double.parse(costController.text));
                       },
                       child: const Text("Confirm sale")),
                 ));

@@ -12,6 +12,7 @@ class BrandManufaturer {
   bool manufacturerAgreed;
   DateTime dateCreated;
   String id;
+  int approved;
   BrandManufaturer({
     required this.brandID,
     required this.manufacturerID,
@@ -22,6 +23,7 @@ class BrandManufaturer {
     required this.manufacturerAgreed,
     required this.dateCreated,
     required this.id,
+    required this.approved,
   });
 
   BrandManufaturer copyWith({
@@ -34,6 +36,7 @@ class BrandManufaturer {
     bool? manufacturerAgreed,
     DateTime? dateCreated,
     String? id,
+    int? approved,
   }) {
     return BrandManufaturer(
       brandID: brandID ?? this.brandID,
@@ -45,6 +48,7 @@ class BrandManufaturer {
       manufacturerAgreed: manufacturerAgreed ?? this.manufacturerAgreed,
       dateCreated: dateCreated ?? this.dateCreated,
       id: id ?? this.id,
+      approved: approved ?? this.approved,
     );
   }
 
@@ -59,6 +63,7 @@ class BrandManufaturer {
       'manufacturerAgreed': manufacturerAgreed,
       'dateCreated': dateCreated.millisecondsSinceEpoch,
       'id': id,
+      'approved': approved,
     };
   }
 
@@ -73,6 +78,7 @@ class BrandManufaturer {
       manufacturerAgreed: map['manufacturerAgreed'] ?? false,
       dateCreated: DateTime.fromMillisecondsSinceEpoch(map['dateCreated']),
       id: map['id'] ?? '',
+      approved: map['approved']?.toInt() ?? 0,
     );
   }
 
@@ -83,7 +89,7 @@ class BrandManufaturer {
 
   @override
   String toString() {
-    return 'BrandManufaturer(brandID: $brandID, manufacturerID: $manufacturerID, productID: $productID, product: $product, quantity: $quantity, userCreated: $userCreated, manufacturerAgreed: $manufacturerAgreed, dateCreated: $dateCreated, id: $id)';
+    return 'BrandManufaturer(brandID: $brandID, manufacturerID: $manufacturerID, productID: $productID, product: $product, quantity: $quantity, userCreated: $userCreated, manufacturerAgreed: $manufacturerAgreed, dateCreated: $dateCreated, id: $id, approved: $approved)';
   }
 
   @override
@@ -99,7 +105,8 @@ class BrandManufaturer {
         other.userCreated == userCreated &&
         other.manufacturerAgreed == manufacturerAgreed &&
         other.dateCreated == dateCreated &&
-        other.id == id;
+        other.id == id &&
+        other.approved == approved;
   }
 
   @override
@@ -112,6 +119,7 @@ class BrandManufaturer {
         userCreated.hashCode ^
         manufacturerAgreed.hashCode ^
         dateCreated.hashCode ^
-        id.hashCode;
+        id.hashCode ^
+        approved.hashCode;
   }
 }

@@ -33,9 +33,10 @@ dependencies:
   syncfusion_flutter_barcodes: ^21.1.41
   cloud_functions: ^4.1.1
   path_provider: ^2.0.15
-  # http: ^0.13.6
   riverpod_annotation: ^2.1.0
   fluttertoast: ^8.2.2
+  smooth_page_indicator: ^1.1.0
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:

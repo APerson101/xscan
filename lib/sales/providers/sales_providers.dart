@@ -29,8 +29,13 @@ class ConfirmSale extends _$ConfirmSale {
     return ConfirmSaleEnum.idle;
   }
 
-  tryConfirmSale(SalesModel staff, String barcode, String receiver,
-      ScanModel scanned) async {
+  tryConfirmSale(
+    SalesModel staff,
+    String barcode,
+    String receiver,
+    ScanModel scanned,
+    double cost,
+  ) async {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
       var fileID = await db.getFileFromBarcode(barcode);
@@ -38,12 +43,16 @@ class ConfirmSale extends _$ConfirmSale {
       await db.appendFileSales(barcode, staff, fileID, receiver, pk);
       var sender = await db.getAddressFromID(staff.brandID);
       //create receipt and send nft to owner and save nft id as receipt id
+
       var nftId = await db.createNFTReceipt(staff.brandName, "XMY", receiver);
       var transfer = Transfer(
         senderAddress: sender,
         receiverAddress: receiver,
         receiptID: nftId,
         brandID: staff.brandID,
+        barcodeID: barcode,
+        time: DateTime.now(),
+        cost: cost,
         productID: scanned.productID!,
       );
       await db.saveTransfer(transfer);

@@ -6,7 +6,7 @@ part of 'sales_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$confirmSaleHash() => r'c22860213be1282f78d9a2e935ae9cb49efa2bd3';
+String _$confirmSaleHash() => r'81290773ad954c4b6d145640193368696bfb791c';
 
 /// See also [ConfirmSale].
 @ProviderFor(ConfirmSale)

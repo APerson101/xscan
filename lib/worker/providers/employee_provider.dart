@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:xscan/manufacturer/models/employee.dart';
 
 import '../../brand view/helpers/db.dart';
-import '../../brand view/models/product.dart';
+import '../../brand view/models/manufacturer.dart';
 import '../models/scanmodel.dart';
 
 part 'employee_provider.g.dart';
@@ -21,7 +21,6 @@ class EmployeeApproveCode extends _$EmployeeApproveCode {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
       var brandName = await db.getBrandNameFromProductID(scanModel.productID!);
-
       await db.employeeScanItem(
         barcode,
         scanModel..brandName = brandName,
@@ -32,7 +31,7 @@ class EmployeeApproveCode extends _$EmployeeApproveCode {
 }
 
 final getAllEmployeeProducts =
-    FutureProvider.family<List<Product>, String>((ref, businessID) async {
+    FutureProvider.family<List<Agreement>, String>((ref, businessID) async {
   var db = GetIt.I<DataBase>();
   return await db.getProductsEmployeeWorksFor(businessID);
 });

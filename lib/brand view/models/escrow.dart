@@ -7,12 +7,14 @@ class Escrow {
   int amount;
   DateTime created;
   String id;
+  String partnershipID;
   Escrow(
       {required this.senderAccountID,
       required this.receiverAccountID,
       required this.amount,
       required this.created,
       required this.id,
+      required this.partnershipID,
       required this.status});
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class Escrow {
       'receiverAccountID': receiverAccountID,
       'amount': amount,
       'id': id,
+      'partnershipID': partnershipID,
       'created': created.millisecondsSinceEpoch,
       'status': status.value
     };
@@ -32,6 +35,7 @@ class Escrow {
         receiverAccountID: map['receiverAccountID'] ?? '',
         amount: map['amount']?.toInt() ?? 0,
         id: map['id'],
+        partnershipID: map['partnershipID'],
         created: DateTime.fromMillisecondsSinceEpoch(map['created']),
         status: EscrowStatusEnum.values
             .firstWhere((element) => element.value == map['status']));

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:xscan/brand%20view/helpers/db.dart';
+import 'package:xscan/brand%20view/helpers/db2.dart';
 
 import 'brand view/providers/login_provider.dart';
 import 'brand view/screens/login_view.dart';
@@ -28,6 +29,11 @@ void main() async {
   GetIt.I.registerSingleton<FirebaseFunctions>(
       FirebaseFunctions.instance..useFunctionsEmulator('192.168.8.100', 5001));
   GetIt.I.registerSingleton<DataBase>(DataBase(
+      auth: GetIt.I<FirebaseAuth>(),
+      functions: GetIt.I<FirebaseFunctions>(),
+      storage: GetIt.I<FirebaseStorage>(),
+      store: GetIt.I<FirebaseFirestore>()));
+  GetIt.I.registerSingleton<BaseHelper>(BaseHelper(
       auth: GetIt.I<FirebaseAuth>(),
       functions: GetIt.I<FirebaseFunctions>(),
       storage: GetIt.I<FirebaseStorage>(),
@@ -67,6 +73,7 @@ class MainApp extends ConsumerWidget {
           ),
           home: Scaffold(body: view));
     }, error: (Object error, StackTrace stackTrace) {
+      debugPrintStack(stackTrace: stackTrace);
       return const MaterialApp(
           home: Scaffold(body: Center(child: Text("error loading login"))));
     }, loading: () {

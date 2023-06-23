@@ -9,14 +9,15 @@ class ManuProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(children: [
+      Text(data.name),
+      Text(data.location),
+      Text(data.notes),
+      Image.network(data.logoImage),
       ElevatedButton(
           onPressed: () async {
             ref.watch(loginStateProvider.notifier).logout();
           },
           child: const Text("Sign out")),
-      Text(data.name),
-      Text(data.location),
-      Text(data.notes),
     ]);
   }
 }

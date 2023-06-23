@@ -6,7 +6,7 @@ part of 'accept_offer_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$acceptOfferHash() => r'64a3cd7bd663bddf282fb751dd60a1781b325420';
+String _$acceptOfferHash() => r'bc8a71fc49b1b721f64739391979a5fd3c2a7d28';
 
 /// See also [AcceptOffer].
 @ProviderFor(AcceptOffer)

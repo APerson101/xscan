@@ -7,8 +7,8 @@ import 'package:lottie/lottie.dart';
 import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
 
-import '../../user/user_main.dart';
 import '../models/brand.dart';
+import '../models/usermodel.dart';
 import '../providers/login_provider.dart';
 
 class LoginView extends ConsumerWidget {
@@ -99,20 +99,6 @@ class LoginView extends ConsumerWidget {
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15)))),
                       const SizedBox(height: 50),
-                      Row(
-                        children: [
-                          const Expanded(child: Divider()),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                    MaterialPageRoute(builder: ((context) {
-                                  return const UserMain();
-                                })));
-                              },
-                              child: const Text("Or Click here to scan")),
-                          const Expanded(child: Divider()),
-                        ],
-                      ),
                       Row(
                         children: [
                           Expanded(child: Container()),
@@ -333,15 +319,14 @@ class SignUpPage extends ConsumerWidget {
                         labelText: "Enter business address"),
                   )
                 : Container(),
-            ref.watch(_selectedUserTypes) != UserTypes.user
-                ? ElevatedButton(
-                    onPressed: () async {
-                      ref.watch(_businessLogo.notifier).state =
-                          await ImagePicker()
-                              .pickImage(source: ImageSource.gallery);
-                    },
-                    child: const Text("Select logo"))
-                : Container(),
+            ElevatedButton(
+                onPressed: () async {
+                  ref.watch(_businessLogo.notifier).state = await ImagePicker()
+                      .pickImage(source: ImageSource.gallery);
+                },
+                child: Text(ref.watch(_selectedUserTypes) != UserTypes.user
+                    ? "Select logo"
+                    : "Select Profile pic")),
             ElevatedButton(
                 onPressed: () async {
                   var model = switch (ref.watch(_selectedUserTypes)) {
@@ -354,16 +339,27 @@ class SignUpPage extends ConsumerWidget {
                         phone: phoneNumberController.text,
                         address: addressController.text,
                         email: emailController.text,
+                        logoImage: ref.watch(_businessLogo)!.path,
                         accountID: 'accountID',
                         catalog: []),
                     UserTypes.manufacturer => Manufacturer(
                         name: nameController.text,
                         location: locationController.text,
                         notes: descriptionController.text,
+                        logoImage: ref.watch(_businessLogo)!.path,
                         id: const Uuid().v4(),
                         privateKey: 'privateKey',
                         accountID: 'accountID',
                         productions: []),
+                    UserTypes.user => UserModel(
+                        name: nameController.text,
+                        privateKey: 'privateKey',
+                        accountID: 'accountID',
+                        email: emailController.text,
+                        id: const Uuid().v4(),
+                        created: DateTime.now(),
+                        profilePic: ref.watch(_businessLogo)!.path,
+                      ),
                     _ => Container()
                   };
                   ref.watch(loginStateProvider.notifier).createAccount(

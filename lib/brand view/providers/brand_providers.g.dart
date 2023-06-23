@@ -60,7 +60,7 @@ final removeManuRequestStateProvider = AutoDisposeAsyncNotifierProvider<
 typedef _$RemoveManuRequestState
     = AutoDisposeAsyncNotifier<RemoveManuRequestStateEnum>;
 String _$approveProductStateHash() =>
-    r'83164ca3e49b9726fe3dc0e8b54870ae47463fc0';
+    r'c0dc1c77f0c015fe83c62c62aef232f9dacc9332';
 
 /// See also [ApproveProductState].
 @ProviderFor(ApproveProductState)

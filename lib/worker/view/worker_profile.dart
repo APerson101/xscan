@@ -12,6 +12,7 @@ class WorkerProfileView extends ConsumerWidget {
       children: [
         Text(employee.name),
         Text(employee.email),
+        Image.network(employee.image),
         ElevatedButton(
             onPressed: () {
               ref.watch(loginStateProvider.notifier).logout();

@@ -22,12 +22,12 @@ class BDashboardView extends ConsumerWidget {
               right: 0,
               height: 80,
               child: _ActionButtons(brand)),
-          Positioned(
+          const Positioned(
               top: 80,
               left: 0,
               right: 0,
               child: Row(
-                children: const [
+                children: [
                   Expanded(child: Divider()),
                   Text("Actions"),
                   Expanded(child: Divider()),
@@ -39,12 +39,12 @@ class BDashboardView extends ConsumerWidget {
               right: 0,
               height: 250,
               child: _BrandStats(brand: brand)),
-          Positioned(
+          const Positioned(
               top: 350,
               left: 0,
               right: 0,
               child: Row(
-                children: const [
+                children: [
                   Expanded(child: Divider()),
                   Text("Summary"),
                   Expanded(child: Divider()),

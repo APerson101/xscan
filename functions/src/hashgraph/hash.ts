@@ -1,4 +1,4 @@
-import {AccountBalanceQuery, AccountCreateTransaction, AccountId, Client, FileAppendTransaction, FileContentsQuery, FileCreateTransaction, FileId, Hbar, PrivateKey, TokenCreateTransaction, TokenId, TokenSupplyType, TokenType, TransferTransaction} from "@hashgraph/sdk";
+import {AccountBalanceQuery, AccountCreateTransaction, AccountId, Client, FileAppendTransaction, FileContentsQuery, FileCreateTransaction, FileId, Hbar, PrivateKey, TokenAssociateTransaction, TokenCreateTransaction, TokenId, TokenMintTransaction, TokenSupplyType, TokenType, TransferTransaction} from "@hashgraph/sdk";
 import * as dotenv from "dotenv";
 
 dotenv.config({path: "../.env"});
@@ -16,7 +16,9 @@ export async function createnewAccount(client: Client) {
 }
 
 // In the form of an NFT receipt
-export async function createOwnersShipReceipt(client: Client, name: string, symbol: string,
+export async function createOwnersShipReceipt(client: Client, name: string,
+  symbol: string,
+  receiver: string, receiverPK: string
 ) {
   const accountID = `${process.env.ACCOUNT_ID}`;
   const privateKey = `${process.env.PRIVATE_KEY}`;
@@ -37,6 +39,25 @@ export async function createOwnersShipReceipt(client: Client, name: string, symb
   const receipt = await executed.getReceipt(client);
   const tokenID = receipt.tokenId!;
   console.log("The token is id ", tokenID.toString());
+
+  console.log('minting new NFT');
+  const mintReceipt = (await (await (await (new TokenMintTransaction()
+    .setTokenId(tokenID)
+    .setMetadata([Buffer.from("hello world")])
+    .setMaxTransactionFee(new Hbar(20))
+    .freezeWith(client))
+    .sign(PrivateKey.fromString(privateKey)))
+    .execute(client))
+    .getReceipt(client));
+  console.log(`mint receipt is: ${mintReceipt}`);
+  console.log("associating NFT");
+  const asstxn = (await new TokenAssociateTransaction()
+    .setAccountId(receiver)
+    .setTokenIds([tokenID])
+    .freezeWith(client)
+    .sign(PrivateKey.fromString(receiverPK)));
+  const result = (await (await asstxn.execute(client)).getReceipt(client))
+  console.log(`nft association result is: ${result.status}`);
   return tokenID.toString();
 }
 
@@ -114,7 +135,9 @@ export async function getAccountBalance(client: Client, accountID: AccountId) {
     .execute(client);
   return accountBalance.hbars.toTinybars();
 }
+export async function getNFTReceipts(accountID: AccountId, client: Client) {
 
+}
 // async function main() {
 //   const client = await setup();
 //   var key = PrivateKey.generate();

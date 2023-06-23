@@ -7,12 +7,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/models/brand.dart';
 import 'package:xscan/brand%20view/models/brand_manufacturer.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
 import 'package:xscan/brand%20view/models/product.dart';
 import 'package:xscan/brand%20view/models/transfer.dart';
+import 'package:xscan/brand%20view/models/txns_history.dart';
 import 'package:xscan/brand%20view/models/verification.dart';
 import 'package:xscan/brand%20view/providers/login_provider.dart';
 import 'package:xscan/manufacturer/models/employee.dart';
@@ -21,9 +22,11 @@ import 'package:xscan/sales/models/sales_model.dart';
 
 import '../../manufacturer/models/quotation.dart';
 import '../../sales/models/transfermode.dart';
+import '../../user/providers/market_place_provider.dart';
 import '../../worker/models/scanmodel.dart';
 import '../models/escrow.dart';
 import '../models/manufacturer_summart.dart';
+import '../models/usermodel.dart';
 
 class DataBase {
   var get = GetIt.I;
@@ -146,18 +149,31 @@ class DataBase {
   }
 
   createBrand({brand}) async {
+    var imageUrl = await storeImage(brand.logoImage, '${brand.id}.png');
+    brand.logoImage = imageUrl;
     await store.collection('brands').add(brand.toMap());
   }
 
   createManufacturers({Manufacturer? manu}) async {
-    await store.collection('manufacturers').add(manu!.toMap());
+    var imageUrl = await storeImage(manu!.logoImage, '${manu.id}.png');
+    manu.logoImage = imageUrl;
+    await store.collection('manufacturers').add(manu.toMap());
   }
 
   createEmployees(String id, Employee emp) async {
     var id = await createFakeUser(emp.email, emp.password);
     emp.id = id;
+    var imageUrl = await storeImage(emp.image, '${emp.id}.png');
+    emp.image = imageUrl;
     await storeFakeUser(id, 'employee');
     await store.doc('employees/$id').set(emp.toMap());
+  }
+
+  Future<String> storeImage(String path, String imgName) async {
+    File file = File(path);
+    var ref = storage.ref().child('logos/$imgName');
+    await ref.putFile(file, SettableMetadata(contentType: 'image/png'));
+    return await ref.getDownloadURL();
   }
 
   addScannedItem(String scannedItem) async {
@@ -173,6 +189,7 @@ class DataBase {
       ..scanner = Employee(
           email: '1.1@co',
           password: '11111111',
+          image: "TESTING",
           name: 'Toechukwu Kennedy',
           id: EMP_1,
           businessID: 'manufacturer 1');
@@ -290,12 +307,18 @@ class DataBase {
   }
 
   createNFTReceipt(
-      String brandName, String brandSymbol, String receiver) async {
+    String brandName,
+    String brandSymbol,
+    String receiver,
+  ) async {
+    // (await store.collection('users'))
     var nftId = (await functions.httpsCallable('createNFTReceipt').call({
       'data': {
         'brandName': brandName,
         'brandSymbol': brandSymbol,
-        'receiver': receiver
+        'receiver': receiver,
+        'receiverPK':
+            '25ad5032f5c484d011b0482eaf3c1af9b44d07b423f19e7440dca6502d4ec999'
       }
     }))
         .data;
@@ -405,7 +428,8 @@ class DataBase {
     return Brand.fromMap(data.data());
   }
 
-  acceptOffer(String offerID, Product product, String manufacturerID) async {
+  acceptOffer(
+      String offerID, Agreement agreement, String manufacturerID) async {
     await store
         .doc('partnerships/$offerID')
         .update({'manufacturerAgreed': true});
@@ -418,7 +442,7 @@ class DataBase {
         .docs[0]
         .id;
     (await store.doc('manufacturers/$id').update({
-      'productions': FieldValue.arrayUnion([product.toMap()])
+      'productions': FieldValue.arrayUnion([agreement.toMap()])
     }));
 
     // add product to manufacturer
@@ -438,36 +462,31 @@ class DataBase {
         .docs[0];
     var id = doc.id;
     debugPrint(id);
-    // var urls = await saveImages(images, brand, newProduct.id);
+    var urls = await saveImages(images, brand, newProduct.id);
     // save images to database
+    newProduct.imageLink = urls;
     (await store.doc('brands/$id').update({
-      'catalog': [
-        newProduct
-            // ..imageLink = ['urls']
-            .toMap()
-      ]
+      'catalog': FieldValue.arrayUnion([newProduct.toMap()])
     }));
   }
 
-  saveImages(List<XFile> imageLinks, Brand brand, String productID) async {
-    var storageRef = storage.ref();
-    Directory appDocDir = await getApplicationDocumentsDirectory();
+  Future<List<String>> saveImages(
+      List<XFile> imageLinks, Brand brand, String productID) async {
     List<String> urls = [];
-    imageLinks.map((link) async {
-      String filePath = '${appDocDir.absolute}/${link.name}';
-      File file = File(filePath);
-//
-      final imageRef = storageRef.child(link.name);
+    for (var link in imageLinks) {
+      File file = File(link.path);
+      final imageRef =
+          storage.ref().child('products/$productID/${link.name}.png');
       await imageRef.putFile(
           file,
-          SettableMetadata(contentType: "image/jpeg", customMetadata: {
+          SettableMetadata(contentType: "image/png", customMetadata: {
             'brandID': brand.id,
             'productId': productID,
             'brandName': brand.name
           }));
       var url = await imageRef.getDownloadURL();
       urls.add(url);
-    });
+    }
     return urls;
   }
 
@@ -518,7 +537,7 @@ class DataBase {
     List<int> numberOfItemsProducedForBrand = [];
     for (var man in mans) {
       var items = man.productions
-          .where((element) => element.brandOwner == brandName)
+          .where((element) => element.product.brandOwner == brandName)
           .toList();
       if (items.isNotEmpty) {
         existingPartnerships.add(man);
@@ -556,16 +575,21 @@ class DataBase {
     return ss;
   }
 
-  approveProducts(String barcode, String brandID) async {
+  approveProducts(String barcode, String brandID, String partnershipID) async {
     await store.collection('barcodes/$barcode/updates').add(ScanModel(
             barcode: barcode,
             scanner: Employee(
                 email: 'APPROVAL',
+                image: "NULL",
                 password: 'APPROVAL',
                 name: brandID,
                 id: 'id',
                 businessID: brandID))
         .toMap());
+
+    (await store
+        .doc('partnerships/$partnershipID')
+        .update({'approved': FieldValue.increment(1)}));
   }
 
   getOwnership(String barcode) async {
@@ -605,7 +629,7 @@ class DataBase {
     }
   }
 
-  Future<List<Product>> getProductsEmployeeWorksFor(String businessID) async {
+  Future<List<Agreement>> getProductsEmployeeWorksFor(String businessID) async {
     var doc = (await store
             .collection('manufacturers')
             .where('id', isEqualTo: businessID)
@@ -674,12 +698,14 @@ class DataBase {
   }
 
   approveProductsManu(String barcode, String businessID) async {
+    // get image from business ID
     await store.collection('barcodes/$barcode/updates').add(ScanModel(
             barcode: barcode,
             timeAdded: DateTime.now(),
             scanner: Employee(
                 email: 'APPROVAL',
                 password: 'APPROVAL',
+                image: 'BUSINESS',
                 name: 'BUSINESS APPROVAL',
                 id: 'id',
                 businessID: businessID))
@@ -729,7 +755,16 @@ class DataBase {
     await functions.httpsCallable('appendFile').call({
       'data': {'fileId': fileID, 'text': '${txn.toJson()} --- ', 'pk': brandPK}
     });
-    debugPrint('file appent success');
+    var history = ItemOwnershipHistory(
+      barcode: barcode,
+      brandID: staff.brandID,
+      id: const Uuid().v4(),
+      owners: [
+        Owner(accountID: to, amountPaid: '1000', purchased: DateTime.now())
+      ],
+    );
+    (await store.collection('Ownership History').add(history.toMap()));
+    debugPrint('file append success');
   }
 
   getPKfromName(String name) async {
@@ -743,6 +778,11 @@ class DataBase {
   }
 
   createSales(String id, SalesModel salesman) async {
+    var id = await createFakeUser(salesman.email, salesman.password);
+    salesman.id = id;
+    var imageUrl = await storeImage(salesman.image, '${salesman.id}.png');
+    salesman.image = imageUrl;
+    await storeFakeUser(id, 'sales');
     (await store.doc('sales/$id').set(salesman.toMap()));
   }
 
@@ -762,12 +802,11 @@ class DataBase {
 
   sendFundsEscrow(
       String senderAccountId, String senderPrivateKey, int amount) async {
-    var res = await functions.httpsCallable('transferHbarEscrow').call({
+    await functions.httpsCallable('transferHbarEscrow').call({
       'senderAccountid': senderAccountId,
       'senderPrivateKey': senderPrivateKey,
       'amount': amount
     });
-    debugPrint(res.data);
   }
 
   saveEscrowToHistory(Escrow escrow) async {
@@ -776,12 +815,12 @@ class DataBase {
 
   approveEscrow(Escrow escrow) async {
     escrow.status = EscrowStatusEnum.approved;
+    debugPrint('Sending funds to the manufacturer');
     await store.doc('escrows/${escrow.id}').update(escrow.toMap());
-    var res = await functions.httpsCallable('approveEscrowTransfer').call({
+    await functions.httpsCallable('approveEscrowTransfer').call({
       'receiverAccountID': escrow.receiverAccountID,
       'amount': escrow.amount
     });
-    debugPrint(res.data);
   }
 
   sendQuotation(QuotationModel quotationmodel) async {
@@ -800,6 +839,121 @@ class DataBase {
     }
 
     return allQuotes;
+  }
+
+  Future<BrandManufaturer> getPartnershipFromID(String partnershipID) async {
+    return BrandManufaturer.fromMap((await store
+            .collection('partnerships')
+            .where('id', isEqualTo: partnershipID)
+            .limit(1)
+            .get())
+        .docs[0]
+        .data());
+  }
+
+  Future<Escrow> getEscrowFromPartnershipID(String partnershipID) async {
+    return Escrow.fromMap((await store
+            .collection('escrows')
+            .where('partnershipID', isEqualTo: partnershipID)
+            .limit(1)
+            .get())
+        .docs[0]
+        .data());
+  }
+
+  createAppUser({required UserModel user}) async {
+    var imageUrl = await storeImage(user.profilePic, '${user.id}.png');
+    user.profilePic = imageUrl;
+    await store.collection('appusers').add(user.toMap());
+  }
+
+  addItemforSale(
+      {required String barcode,
+      required double price,
+      required String seller}) async {
+    (await store
+        .collection("market")
+        .add({'barcode': barcode, 'price': price, 'seller': seller}));
+  }
+
+  confirmReSale(
+      {required String barcode, required Transfer transaction}) async {
+    (await store.collection('resold/$barcode/sales').add(transaction.toMap()));
+  }
+
+  removeSale({required String barcode}) async {
+    var id = (await store
+            .collection('market')
+            .where('barcode', isEqualTo: barcode)
+            .limit(1)
+            .get())
+        .docs[0]
+        .id;
+    (await store.doc('market/$id').delete());
+  }
+
+  Future<List<ItemForSale>> getAllForSale() async {
+    var allBarcodesForSaleDocs = (await store.collection('market').get()).docs;
+    List<String> allBarcodes = [];
+    List<int> prices = [];
+    List<String> sellers = [];
+    for (var doc in allBarcodesForSaleDocs) {
+      sellers.add(doc.get('seller'));
+      allBarcodes.add(doc.get('barcode'));
+      prices.add(doc.get('price'));
+    }
+
+    List<ItemForSale> forSale = [];
+
+    String productID, productName;
+    ItemOwnershipHistory ownership;
+    for (var code in allBarcodes) {
+      //get product
+      var scanned =
+          ScanModel.fromMap((await store.doc('barcodes/$code').get()).data()!);
+      productID = scanned.productID!;
+      productName = scanned.productName!;
+      //get original owner
+      var ownerFirst = Transfer.fromMap((await store
+              .collection('transfers')
+              .where('barcodeID', isEqualTo: code)
+              .limit(1)
+              .get())
+          .docs[0]
+          .data());
+      //get onwership history of barcode
+      var resoldDocs =
+          (await store.collection('resold/$code/sales').get()).docs;
+      List<Owner> owners = [
+        Owner(
+            accountID: ownerFirst.receiverAddress,
+            amountPaid: ownerFirst.cost.toString(),
+            purchased: ownerFirst.time)
+      ];
+      var brandId = '';
+      for (var resoldItem in resoldDocs) {
+        // convert to object
+        var txn = Transfer.fromMap(resoldItem.data());
+        brandId = txn.brandID;
+        owners.add(Owner(
+            accountID: txn.receiverAddress,
+            amountPaid: txn.cost.toString(),
+            purchased: txn.time));
+      }
+      ownership = ItemOwnershipHistory(
+          id: '', barcode: code, brandID: brandId, owners: owners);
+      forSale.add((
+        productImages: [],
+        productID: productID,
+        productName: productName,
+        productComments: [],
+        price: prices[allBarcodes.indexOf(code)].toDouble(),
+        sellerImage: '',
+        itemHistory: ownership,
+        itemBarcode: code
+      ));
+    }
+    return forSale;
   }
 }
   // maybe: Retrieve NFT

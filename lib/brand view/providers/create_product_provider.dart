@@ -21,12 +21,7 @@ class ProductCreationState extends _$ProductCreationState {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
       await db.addProduct(product, brand, files);
-      // return Future.delayed(const Duration(seconds: 2), () {
-      //   var type =
-      //       Random.secure().nextInt(ProductCreationStateEnum.values.length);
-      //   debugPrint(describeEnum(ProductCreationStateEnum.values[type]));
       return ProductCreationStateEnum.successful;
-      // });
     });
   }
 }

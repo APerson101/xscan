@@ -8,6 +8,7 @@ import '../../manufacturer/models/quotation.dart';
 import '../../manufacturer/providers/accept_offer_provider.dart';
 import '../models/brand.dart';
 import '../models/brand_manufacturer.dart';
+import '../models/manufacturer.dart';
 
 part 'notifications_provider.g.dart';
 
@@ -27,11 +28,14 @@ acceptQuotation(AcceptQuotationRef ref, QuotationModel quotation, Brand brand,
       senderAccountID: brand.id,
       receiverAccountID: quotation.manu.accountID,
       amount: quotation.amount,
+      partnershipID: transaction.id,
       created: DateTime.now(),
       id: const Uuid().v4(),
       status: EscrowStatusEnum.pending));
   ref.watch(acceptOfferProvider.notifier).acceptOffer(
-      transaction.id, transaction.product, transaction.manufacturerID);
+      transaction.id,
+      Agreement(product: transaction.product, agreementID: transaction.id),
+      transaction.manufacturerID);
 
   // send notification to manufacturer to start production
 }

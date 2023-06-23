@@ -5,7 +5,9 @@ class SalesModel {
   String email;
   String brandID;
   String id;
+  String password;
   String brandName;
+  String image;
   String privateKey;
   String accountID;
   SalesModel({
@@ -13,7 +15,9 @@ class SalesModel {
     required this.email,
     required this.brandID,
     required this.id,
+    required this.password,
     required this.brandName,
+    required this.image,
     required this.privateKey,
     required this.accountID,
   });
@@ -23,7 +27,9 @@ class SalesModel {
     String? email,
     String? brandID,
     String? id,
+    String? password,
     String? brandName,
+    String? image,
     String? privateKey,
     String? accountID,
   }) {
@@ -32,7 +38,9 @@ class SalesModel {
       email: email ?? this.email,
       brandID: brandID ?? this.brandID,
       id: id ?? this.id,
+      password: password ?? this.password,
       brandName: brandName ?? this.brandName,
+      image: image ?? this.image,
       privateKey: privateKey ?? this.privateKey,
       accountID: accountID ?? this.accountID,
     );
@@ -44,7 +52,9 @@ class SalesModel {
       'email': email,
       'brandID': brandID,
       'id': id,
+      'password': password,
       'brandName': brandName,
+      'image': image,
       'privateKey': privateKey,
       'accountID': accountID,
     };
@@ -56,7 +66,9 @@ class SalesModel {
       email: map['email'] ?? '',
       brandID: map['brandID'] ?? '',
       id: map['id'] ?? '',
+      password: map['password'] ?? '',
       brandName: map['brandName'] ?? '',
+      image: map['image'] ?? '',
       privateKey: map['privateKey'] ?? '',
       accountID: map['accountID'] ?? '',
     );
@@ -69,7 +81,7 @@ class SalesModel {
 
   @override
   String toString() {
-    return 'SalesModel(name: $name, email: $email, brandID: $brandID, id: $id, brandName: $brandName, privateKey: $privateKey, accountID: $accountID)';
+    return 'SalesModel(name: $name, email: $email, brandID: $brandID, id: $id, password: $password, brandName: $brandName, image: $image, privateKey: $privateKey, accountID: $accountID)';
   }
 
   @override
@@ -81,7 +93,9 @@ class SalesModel {
         other.email == email &&
         other.brandID == brandID &&
         other.id == id &&
+        other.password == password &&
         other.brandName == brandName &&
+        other.image == image &&
         other.privateKey == privateKey &&
         other.accountID == accountID;
   }
@@ -92,7 +106,9 @@ class SalesModel {
         email.hashCode ^
         brandID.hashCode ^
         id.hashCode ^
+        password.hashCode ^
         brandName.hashCode ^
+        image.hashCode ^
         privateKey.hashCode ^
         accountID.hashCode;
   }

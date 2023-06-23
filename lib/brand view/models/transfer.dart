@@ -6,12 +6,18 @@ class Transfer {
   String receiptID;
   String brandID;
   String productID;
+  String barcodeID;
+  DateTime time;
+  double cost;
   Transfer({
     required this.senderAddress,
     required this.receiverAddress,
     required this.receiptID,
     required this.brandID,
     required this.productID,
+    required this.barcodeID,
+    required this.time,
+    required this.cost,
   });
 
   Transfer copyWith({
@@ -20,6 +26,9 @@ class Transfer {
     String? receiptID,
     String? brandID,
     String? productID,
+    String? barcodeID,
+    DateTime? time,
+    double? cost,
   }) {
     return Transfer(
       senderAddress: senderAddress ?? this.senderAddress,
@@ -27,6 +36,9 @@ class Transfer {
       receiptID: receiptID ?? this.receiptID,
       brandID: brandID ?? this.brandID,
       productID: productID ?? this.productID,
+      barcodeID: barcodeID ?? this.barcodeID,
+      time: time ?? this.time,
+      cost: cost ?? this.cost,
     );
   }
 
@@ -37,6 +49,9 @@ class Transfer {
       'receiptID': receiptID,
       'brandID': brandID,
       'productID': productID,
+      'barcodeID': barcodeID,
+      'time': time.millisecondsSinceEpoch,
+      'cost': cost,
     };
   }
 
@@ -47,6 +62,9 @@ class Transfer {
       receiptID: map['receiptID'] ?? '',
       brandID: map['brandID'] ?? '',
       productID: map['productID'] ?? '',
+      barcodeID: map['barcodeID'] ?? '',
+      time: DateTime.fromMillisecondsSinceEpoch(map['time']),
+      cost: map['cost']?.toDouble() ?? 0.0,
     );
   }
 
@@ -57,7 +75,7 @@ class Transfer {
 
   @override
   String toString() {
-    return 'Transfer(senderAddress: $senderAddress, receiverAddress: $receiverAddress, receiptID: $receiptID, brandID: $brandID, productID: $productID)';
+    return 'Transfer(senderAddress: $senderAddress, receiverAddress: $receiverAddress, receiptID: $receiptID, brandID: $brandID, productID: $productID, barcodeID: $barcodeID, time: $time, cost: $cost)';
   }
 
   @override
@@ -69,7 +87,10 @@ class Transfer {
         other.receiverAddress == receiverAddress &&
         other.receiptID == receiptID &&
         other.brandID == brandID &&
-        other.productID == productID;
+        other.productID == productID &&
+        other.barcodeID == barcodeID &&
+        other.time == time &&
+        other.cost == cost;
   }
 
   @override
@@ -78,6 +99,9 @@ class Transfer {
         receiverAddress.hashCode ^
         receiptID.hashCode ^
         brandID.hashCode ^
-        productID.hashCode;
+        productID.hashCode ^
+        barcodeID.hashCode ^
+        time.hashCode ^
+        cost.hashCode;
   }
 }

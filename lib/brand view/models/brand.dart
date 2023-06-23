@@ -13,6 +13,7 @@ class Brand {
   DateTime created;
   String privateKey;
   String accountID;
+  String logoImage;
   List<Product> catalog;
   Brand({
     required this.name,
@@ -24,6 +25,7 @@ class Brand {
     required this.created,
     required this.privateKey,
     required this.accountID,
+    required this.logoImage,
     required this.catalog,
   });
 
@@ -37,6 +39,7 @@ class Brand {
     DateTime? created,
     String? privateKey,
     String? accountID,
+    String? logoImage,
     List<Product>? catalog,
   }) {
     return Brand(
@@ -49,6 +52,7 @@ class Brand {
       created: created ?? this.created,
       privateKey: privateKey ?? this.privateKey,
       accountID: accountID ?? this.accountID,
+      logoImage: logoImage ?? this.logoImage,
       catalog: catalog ?? this.catalog,
     );
   }
@@ -64,6 +68,7 @@ class Brand {
       'created': created.millisecondsSinceEpoch,
       'privateKey': privateKey,
       'accountID': accountID,
+      'logoImage': logoImage,
       'catalog': catalog.map((x) => x.toMap()).toList(),
     };
   }
@@ -79,6 +84,7 @@ class Brand {
       created: DateTime.fromMillisecondsSinceEpoch(map['created']),
       privateKey: map['privateKey'] ?? '',
       accountID: map['accountID'] ?? '',
+      logoImage: map['logoImage'] ?? '',
       catalog:
           List<Product>.from(map['catalog']?.map((x) => Product.fromMap(x))),
     );
@@ -90,7 +96,7 @@ class Brand {
 
   @override
   String toString() {
-    return 'Brand(name: $name, id: $id, location: $location, phone: $phone, address: $address, email: $email, created: $created, privateKey: $privateKey, accountID: $accountID, catalog: $catalog)';
+    return 'Brand(name: $name, id: $id, location: $location, phone: $phone, address: $address, email: $email, created: $created, privateKey: $privateKey, accountID: $accountID, logoImage: $logoImage, catalog: $catalog)';
   }
 
   @override
@@ -107,6 +113,7 @@ class Brand {
         other.created == created &&
         other.privateKey == privateKey &&
         other.accountID == accountID &&
+        other.logoImage == logoImage &&
         listEquals(other.catalog, catalog);
   }
 
@@ -121,6 +128,7 @@ class Brand {
         created.hashCode ^
         privateKey.hashCode ^
         accountID.hashCode ^
+        logoImage.hashCode ^
         catalog.hashCode;
   }
 }

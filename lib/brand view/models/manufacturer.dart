@@ -10,7 +10,8 @@ class Manufacturer {
   String id;
   String privateKey;
   String accountID;
-  List<Product> productions;
+  String logoImage;
+  List<Agreement> productions;
   Manufacturer({
     required this.name,
     required this.location,
@@ -18,6 +19,7 @@ class Manufacturer {
     required this.id,
     required this.privateKey,
     required this.accountID,
+    required this.logoImage,
     required this.productions,
   });
 
@@ -28,7 +30,8 @@ class Manufacturer {
     String? id,
     String? privateKey,
     String? accountID,
-    List<Product>? productions,
+    String? logoImage,
+    List<Agreement>? productions,
   }) {
     return Manufacturer(
       name: name ?? this.name,
@@ -37,6 +40,7 @@ class Manufacturer {
       id: id ?? this.id,
       privateKey: privateKey ?? this.privateKey,
       accountID: accountID ?? this.accountID,
+      logoImage: logoImage ?? this.logoImage,
       productions: productions ?? this.productions,
     );
   }
@@ -49,6 +53,7 @@ class Manufacturer {
       'id': id,
       'privateKey': privateKey,
       'accountID': accountID,
+      'logoImage': logoImage,
       'productions': productions.map((x) => x.toMap()).toList(),
     };
   }
@@ -61,8 +66,9 @@ class Manufacturer {
       id: map['id'] ?? '',
       privateKey: map['privateKey'] ?? '',
       accountID: map['accountID'] ?? '',
-      productions: List<Product>.from(
-          map['productions']?.map((x) => Product.fromMap(x))),
+      logoImage: map['logoImage'] ?? '',
+      productions: List<Agreement>.from(
+          map['productions']?.map((x) => Agreement.fromMap(x))),
     );
   }
 
@@ -73,7 +79,7 @@ class Manufacturer {
 
   @override
   String toString() {
-    return 'Manufacturer(name: $name, location: $location, notes: $notes, id: $id, privateKey: $privateKey, accountID: $accountID, productions: $productions)';
+    return 'Manufacturer(name: $name, location: $location, notes: $notes, id: $id, privateKey: $privateKey, accountID: $accountID, logoImage: $logoImage, productions: $productions)';
   }
 
   @override
@@ -87,6 +93,7 @@ class Manufacturer {
         other.id == id &&
         other.privateKey == privateKey &&
         other.accountID == accountID &&
+        other.logoImage == logoImage &&
         listEquals(other.productions, productions);
   }
 
@@ -98,6 +105,61 @@ class Manufacturer {
         id.hashCode ^
         privateKey.hashCode ^
         accountID.hashCode ^
+        logoImage.hashCode ^
         productions.hashCode;
   }
+}
+
+class Agreement {
+  String agreementID;
+  Product product;
+  Agreement({
+    required this.agreementID,
+    required this.product,
+  });
+
+  Agreement copyWith({
+    String? agreementID,
+    Product? product,
+  }) {
+    return Agreement(
+      agreementID: agreementID ?? this.agreementID,
+      product: product ?? this.product,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'agreementID': agreementID,
+      'product': product.toMap(),
+    };
+  }
+
+  factory Agreement.fromMap(Map<String, dynamic> map) {
+    return Agreement(
+      agreementID: map['agreementID'] ?? '',
+      product: Product.fromMap(map['product']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Agreement.fromJson(String source) =>
+      Agreement.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'Agreement(agreementID: $agreementID, product: $product)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Agreement &&
+        other.agreementID == agreementID &&
+        other.product == product;
+  }
+
+  @override
+  int get hashCode => agreementID.hashCode ^ product.hashCode;
 }

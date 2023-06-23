@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/helpers/db.dart';
@@ -46,11 +47,19 @@ class CreateEmployeePage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(20)))),
               ElevatedButton(
                   onPressed: () async {
+                    ref.watch(_employeeImage.notifier).state =
+                        await ImagePicker()
+                            .pickImage(source: ImageSource.gallery);
+                  },
+                  child: const Text("Select employee profile pic")),
+              ElevatedButton(
+                  onPressed: () async {
                     ref.watch(createEmployeeProvider(Employee(
                         email: emailController.text,
                         password: passwordController.text,
                         name: nameController.text,
                         id: const Uuid().v4(),
+                        image: ref.watch(_employeeImage)!.path,
                         businessID: manufacturer.id)));
                     Navigator.of(context).pop();
                     ref.invalidate(getEmployees(manufacturer.id));
@@ -67,3 +76,5 @@ FutureOr createEmployee(CreateEmployeeRef ref, Employee employee) async {
   var db = GetIt.I<DataBase>();
   await db.createEmployees(employee.id, employee);
 }
+
+final _employeeImage = StateProvider<XFile?>((ref) => null);

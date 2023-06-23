@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:xscan/manufacturer/models/employee.dart';
 import 'package:xscan/worker/models/scanmodel.dart';
 
-import '../../brand view/models/product.dart';
+import '../../brand view/models/manufacturer.dart';
 import '../providers/employee_provider.dart';
 
 class ScannedBarcodeView extends ConsumerWidget {
@@ -34,13 +34,23 @@ class ScannedBarcodeView extends ConsumerWidget {
           Text("scanned code is: $barcode"),
           ref.watch(getAllEmployeeProducts(employee.businessID)).when(
               data: (data) {
-                return DropdownButton<Product>(
+                return DropdownButtonFormField<Agreement>(
                     value: ref.watch(_selectedProduct) ?? data[0],
-                    hint: const Text("Select product"),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      hintText: "Select product",
+                    ),
                     items: data
-                        .map((e) => DropdownMenuItem<Product>(
+                        .map((e) => DropdownMenuItem<Agreement>(
                               value: e,
-                              child: Text(e.name),
+                              child: SizedBox(
+                                  height: 74,
+                                  width: 150,
+                                  child: ListTile(
+                                    title: Text(e.product.name),
+                                    subtitle: Text("ID: ${e.agreementID}"),
+                                  )),
                             ))
                         .toList(),
                     onChanged: (newt) {
@@ -56,10 +66,11 @@ class ScannedBarcodeView extends ConsumerWidget {
                 // save barcode
                 var scanned = ScanModel()
                   ..barcode = barcode
-                  ..brandName = 'brand name'
+                  ..brandName = ref.watch(_selectedProduct)!.product.brandOwner
                   ..id = const Uuid().v4().toString()
-                  ..productID = ref.watch(_selectedProduct)!.id
-                  ..productName = ref.watch(_selectedProduct)!.name
+                  ..agreementID = ref.watch(_selectedProduct)!.agreementID
+                  ..productID = ref.watch(_selectedProduct)!.product.id
+                  ..productName = ref.watch(_selectedProduct)!.product.name
                   ..timeAdded = DateTime.now()
                   ..scanner = employee;
                 ref
@@ -73,4 +84,4 @@ class ScannedBarcodeView extends ConsumerWidget {
   }
 }
 
-final _selectedProduct = StateProvider<Product?>((ref) => null);
+final _selectedProduct = StateProvider<Agreement?>((ref) => null);

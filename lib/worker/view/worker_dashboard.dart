@@ -35,12 +35,15 @@ class _CameraView extends ConsumerWidget {
               barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
                   '#ff6666', 'Cancel', false, ScanMode.BARCODE);
               barcodeScanRes = const Uuid().v4().toString();
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return ScannedBarcodeView(
-                  barcode: barcodeScanRes,
-                  employee: employee,
-                );
-              }));
+              if (context.mounted) {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return ScannedBarcodeView(
+                    barcode: barcodeScanRes,
+                    employee: employee,
+                  );
+                }));
+              }
               debugPrint(barcodeScanRes);
             } on PlatformException {
               barcodeScanRes = 'Failed to get platform version.';

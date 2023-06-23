@@ -23,10 +23,15 @@ export const createNFTReceipt = functions.https.onCall(async (req) => {
   const data = req.data;
   const name = data.brandName;
   const symbol = data.brandSymbol;
-  const nftId = await hash.createOwnersShipReceipt(client, name, symbol);
+  const nftId = await hash.createOwnersShipReceipt(client, name, symbol, data.receiver, data.receiverPK);
   await hash.transferReceiptOwnership(client, TokenId.fromString(nftId), accountID,
     data.receiver, PrivateKey.fromString(privateKey));
   return nftId;
+});
+
+export const retreiveAllNFTReceipts = functions.https.onCall(async (req) => {
+  const accountID: AccountId = AccountId.fromString(req.accountID);
+  return await hash.getNFTReceipts(accountID, getClient());
 });
 export const transferItemNftOwnership = functions.https.onCall(async (req) => {
   const data = req.data;
@@ -77,7 +82,19 @@ export const transferHbarEscrow = functions.https.onCall(async (req) => {
   const senderAccountid = req.senderAccountid;
   const senderPrivateKey = req.senderPrivateKey;
   const amount = req.amount;
+
+  await hash.sendFunds(getClient(),
+    AccountId.fromString(accountID),
+    PrivateKey.fromString(privateKey),
+    10000,
+    AccountId.fromString(senderAccountid)
+  );
+  await new Promise<void>((resolve, reject) => {
+    setTimeout(resolve, 3000);
+    console.log("waiting for stuff before trying it out again")
+  });
   return await hash.sendFunds(getClient(),
+
     AccountId.fromString(senderAccountid),
     PrivateKey.fromString(senderPrivateKey),
     amount,

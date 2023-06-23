@@ -1,0 +1,23 @@
+{
+  "name": "products/1c14d152-3d69-4c9a-bd5b-24fea85032f8/IMG-20230617-WA0014.jpg.png",
+  "bucket": "xscan-9120f.appspot.com",
+  "metageneration": 1,
+  "generation": 1687428401712,
+  "contentType": "image/png",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "98089543-6536-4fe5-891d-51b723d7b06a"
+  ],
+  "etag": "rX7EFMmhMO7oqY4YQ8pNzpanP/s",
+  "customMetadata": {
+    "brandName": "brand A",
+    "productId": "1c14d152-3d69-4c9a-bd5b-24fea85032f8",
+    "brandID": "83VJr9e4lifV8U6i2x24LfJZHVwn"
+  },
+  "timeCreated": "2023-06-22T10:06:41.712Z",
+  "updated": "2023-06-22T10:06:41.712Z",
+  "size": 134106,
+  "md5Hash": "58bdiqO9NSoAoIx2aavmxA==",
+  "crc32c": "1770616518"
+}

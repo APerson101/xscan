@@ -7,7 +7,6 @@ import 'package:xscan/brand%20view/models/manufacturer.dart';
 import 'package:xscan/manufacturer/models/quotation.dart';
 
 import '../../brand view/models/brand_manufacturer.dart';
-import '../../brand view/models/product.dart';
 
 part 'accept_offer_provider.g.dart';
 
@@ -21,13 +20,13 @@ class AcceptOffer extends _$AcceptOffer {
   }
 
   _attemptCreation(
-      String offerID, Product product, String manufacturerID) async {
+      String offerID, Agreement agreement, String manufacturerID) async {
     state = const AsyncValue.data(AcceptOfferCreationState.loading);
     try {
       state = await AsyncValue.guard(() {
         return Future.delayed(const Duration(seconds: 0), () async {
           var db = GetIt.I<DataBase>();
-          await db.acceptOffer(offerID, product, manufacturerID);
+          await db.acceptOffer(offerID, agreement, manufacturerID);
           return AcceptOfferCreationState.success;
         });
       });
@@ -36,8 +35,9 @@ class AcceptOffer extends _$AcceptOffer {
     }
   }
 
-  acceptOffer(String offerID, Product product, String manufacturerID) async {
-    await _attemptCreation(offerID, product, manufacturerID);
+  acceptOffer(
+      String offerID, Agreement agreement, String manufacturerID) async {
+    await _attemptCreation(offerID, agreement, manufacturerID);
   }
 }
 

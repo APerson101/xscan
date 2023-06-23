@@ -119,7 +119,10 @@ class AddNewProductView extends ConsumerWidget {
                           created: DateTime.now(),
                           brandOwner: brand.name,
                           id: const Uuid().v4().toString(),
-                          imageLink: [],
+                          imageLink: ref
+                              .watch(selectedImage)!
+                              .map<String>((e) => e.path)
+                              .toList(),
                           name: productNameController.text,
                           notes: productDescriptionController.text,
                         );

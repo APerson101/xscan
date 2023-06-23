@@ -1,57 +1,133 @@
 import 'dart:convert';
 
-import 'package:xscan/brand%20view/models/circle_destination.dart';
+import 'package:flutter/foundation.dart';
 
 // 0.0.23599
 
-class CircleTransferObject {
-  String transactionHash;
-  String status;
+class ItemOwnershipHistory {
   String id;
-  String destinationAddress;
-  String destinationChain;
-  String senderAddress;
-  String senderChain;
-  CircleAmountObject amount;
-  CircleTransferObject({
-    required this.transactionHash,
-    required this.status,
+  String barcode;
+  String brandID;
+  List<Owner> owners;
+  ItemOwnershipHistory({
     required this.id,
-    required this.senderAddress,
-    required this.senderChain,
-    required this.destinationAddress,
-    required this.destinationChain,
-    required this.amount,
+    required this.barcode,
+    required this.brandID,
+    required this.owners,
   });
+
+  ItemOwnershipHistory copyWith({
+    String? id,
+    String? barcode,
+    String? productID,
+    String? brandID,
+    List<Owner>? owners,
+  }) {
+    return ItemOwnershipHistory(
+      id: id ?? this.id,
+      barcode: barcode ?? this.barcode,
+      brandID: brandID ?? this.brandID,
+      owners: owners ?? this.owners,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
-      'transactionHash': transactionHash,
-      'status': status,
       'id': id,
-      'destinationAddress': destinationAddress,
-      'destinationChain': destinationChain,
-      'senderAddress': senderAddress,
-      'senderChain': senderChain,
-      'amount': amount.toMap(),
+      'barcode': barcode,
+      'brandID': brandID,
+      'owners': owners.map((x) => x.toMap()).toList(),
     };
   }
 
-  factory CircleTransferObject.fromMap(Map<String, dynamic> map) {
-    return CircleTransferObject(
-      transactionHash: map['transactionHash'] ?? '',
-      status: map['status'] ?? '',
+  factory ItemOwnershipHistory.fromMap(Map<String, dynamic> map) {
+    return ItemOwnershipHistory(
       id: map['id'] ?? '',
-      destinationAddress: map['destinationAddress'] ?? '',
-      destinationChain: map['destinationChain'] ?? '',
-      senderAddress: map['senderAddress'] ?? '',
-      senderChain: map['senderChain'] ?? '',
-      amount: CircleAmountObject.fromMap(map['amount']),
+      barcode: map['barcode'] ?? '',
+      brandID: map['brandID'] ?? '',
+      owners: List<Owner>.from(map['owners']?.map((x) => Owner.fromMap(x))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CircleTransferObject.fromJson(String source) =>
-      CircleTransferObject.fromMap(json.decode(source));
+  factory ItemOwnershipHistory.fromJson(String source) =>
+      ItemOwnershipHistory.fromMap(json.decode(source));
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ItemOwnershipHistory &&
+        other.id == id &&
+        other.barcode == barcode &&
+        other.brandID == brandID &&
+        listEquals(other.owners, owners);
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ barcode.hashCode ^ brandID.hashCode ^ owners.hashCode;
+  }
+}
+
+class Owner {
+  String accountID;
+  String amountPaid;
+  DateTime purchased;
+  Owner({
+    required this.accountID,
+    required this.amountPaid,
+    required this.purchased,
+  });
+
+  Owner copyWith({
+    String? accountID,
+    String? amountPaid,
+    DateTime? purchased,
+  }) {
+    return Owner(
+      accountID: accountID ?? this.accountID,
+      amountPaid: amountPaid ?? this.amountPaid,
+      purchased: purchased ?? this.purchased,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'accountID': accountID,
+      'amountPaid': amountPaid,
+      'purchased': purchased.millisecondsSinceEpoch,
+    };
+  }
+
+  factory Owner.fromMap(Map<String, dynamic> map) {
+    return Owner(
+      accountID: map['accountID'] ?? '',
+      amountPaid: map['amountPaid'] ?? '',
+      purchased: DateTime.fromMillisecondsSinceEpoch(map['purchased']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Owner.fromJson(String source) => Owner.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'Owner(accountID: $accountID, amountPaid: $amountPaid, purchased: $purchased)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Owner &&
+        other.accountID == accountID &&
+        other.amountPaid == amountPaid &&
+        other.purchased == purchased;
+  }
+
+  @override
+  int get hashCode =>
+      accountID.hashCode ^ amountPaid.hashCode ^ purchased.hashCode;
 }

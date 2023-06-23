@@ -6,12 +6,14 @@ class Employee {
   String name;
   String id;
   String businessID;
+  String image;
   Employee({
     required this.email,
     required this.password,
     required this.name,
     required this.id,
     required this.businessID,
+    required this.image,
   });
 
   Employee copyWith({
@@ -20,6 +22,7 @@ class Employee {
     String? name,
     String? id,
     String? businessID,
+    String? image,
   }) {
     return Employee(
       email: email ?? this.email,
@@ -27,6 +30,7 @@ class Employee {
       name: name ?? this.name,
       id: id ?? this.id,
       businessID: businessID ?? this.businessID,
+      image: image ?? this.image,
     );
   }
 
@@ -37,6 +41,7 @@ class Employee {
       'name': name,
       'id': id,
       'businessID': businessID,
+      'image': image,
     };
   }
 
@@ -47,6 +52,7 @@ class Employee {
       name: map['name'] ?? '',
       id: map['id'] ?? '',
       businessID: map['businessID'] ?? '',
+      image: map['image'] ?? '',
     );
   }
 
@@ -57,7 +63,7 @@ class Employee {
 
   @override
   String toString() {
-    return 'Employee(email: $email, password: $password, name: $name, id: $id, businessID: $businessID)';
+    return 'Employee(email: $email, password: $password, name: $name, id: $id, businessID: $businessID, image: $image)';
   }
 
   @override
@@ -69,7 +75,8 @@ class Employee {
         other.password == password &&
         other.name == name &&
         other.id == id &&
-        other.businessID == businessID;
+        other.businessID == businessID &&
+        other.image == image;
   }
 
   @override
@@ -78,6 +85,7 @@ class Employee {
         password.hashCode ^
         name.hashCode ^
         id.hashCode ^
-        businessID.hashCode;
+        businessID.hashCode ^
+        image.hashCode;
   }
 }

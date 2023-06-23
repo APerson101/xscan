@@ -76,6 +76,12 @@ class LoginState extends _$LoginState {
               ..id = id
               ..privateKey = privateKey
               ..accountID = accountID);
+      } else if (type == UserTypes.user) {
+        await db.createAppUser(
+            user: model
+              ..id = id
+              ..privateKey = privateKey
+              ..accountID = accountID);
       }
       ref.watch(signUpState.notifier).state = SignUpStates.success;
     } catch (e) {
@@ -95,4 +101,4 @@ class LoginState extends _$LoginState {
 
 final userTypeProvider = StateProvider<UserTypesEnum?>((ref) => null);
 
-enum UserTypesEnum { admin, brand, manufacturer, employee, sales }
+enum UserTypesEnum { admin, brand, manufacturer, employee, sales, user }

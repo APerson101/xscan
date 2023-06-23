@@ -11,6 +11,7 @@ class ScanModel {
   DateTime? timeAdded;
   String? brandName;
   Employee? scanner;
+  String? agreementID;
   ScanModel({
     this.id,
     this.barcode,
@@ -20,6 +21,7 @@ class ScanModel {
     this.timeAdded,
     this.brandName,
     this.scanner,
+    this.agreementID,
   });
 
   ScanModel copyWith({
@@ -31,6 +33,7 @@ class ScanModel {
     DateTime? timeAdded,
     String? brandName,
     Employee? scanner,
+    String? agreementID,
   }) {
     return ScanModel(
       id: id ?? this.id,
@@ -41,6 +44,7 @@ class ScanModel {
       timeAdded: timeAdded ?? this.timeAdded,
       brandName: brandName ?? this.brandName,
       scanner: scanner ?? this.scanner,
+      agreementID: agreementID ?? this.agreementID,
     );
   }
 
@@ -54,12 +58,13 @@ class ScanModel {
       'timeAdded': timeAdded?.millisecondsSinceEpoch,
       'brandName': brandName,
       'scanner': scanner?.toMap(),
+      'agreementID': agreementID,
     };
   }
 
   factory ScanModel.fromMap(Map<String, dynamic> map) {
     return ScanModel(
-      id: map['id'] ?? '',
+      id: map['id'],
       barcode: map['barcode'],
       addrressID: map['addrressID'],
       productID: map['productID'],
@@ -69,6 +74,7 @@ class ScanModel {
           : null,
       brandName: map['brandName'],
       scanner: map['scanner'] != null ? Employee.fromMap(map['scanner']) : null,
+      agreementID: map['agreementID'],
     );
   }
 
@@ -79,7 +85,7 @@ class ScanModel {
 
   @override
   String toString() {
-    return 'ScanModel(id: $id, barcode: $barcode, addrressID: $addrressID, productID: $productID, productName: $productName, timeAdded: $timeAdded, brandName: $brandName, scanner: $scanner)';
+    return 'ScanModel(id: $id, barcode: $barcode, addrressID: $addrressID, productID: $productID, productName: $productName, timeAdded: $timeAdded, brandName: $brandName, scanner: $scanner, agreementID: $agreementID)';
   }
 
   @override
@@ -94,7 +100,8 @@ class ScanModel {
         other.productName == productName &&
         other.timeAdded == timeAdded &&
         other.brandName == brandName &&
-        other.scanner == scanner;
+        other.scanner == scanner &&
+        other.agreementID == agreementID;
   }
 
   @override
@@ -106,6 +113,7 @@ class ScanModel {
         productName.hashCode ^
         timeAdded.hashCode ^
         brandName.hashCode ^
-        scanner.hashCode;
+        scanner.hashCode ^
+        agreementID.hashCode;
   }
 }

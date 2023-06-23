@@ -127,6 +127,7 @@ class AddNewManufacturerView extends ConsumerWidget {
                             productID: ref.watch(selectedProduct)!.id,
                             quantity: int.parse(quantityController.text),
                             manufacturerAgreed: false,
+                            approved: 0,
                             dateCreated: DateTime.now(),
                             userCreated: true);
                         ref

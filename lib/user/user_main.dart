@@ -1,39 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:xscan/user/scaned_info.dart';
+import 'package:xscan/user/market_place_view.dart';
+import 'package:xscan/user/user_dashboard.dart';
 
 class UserMain extends ConsumerWidget {
-  const UserMain({super.key});
+  const UserMain({super.key, required this.id});
+  final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ElevatedButton(
-                onPressed: () async {
-                  String barcodeScanRes;
-                  try {
-                    barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-                        '#ff6666', 'Cancel', false, ScanMode.BARCODE);
-
-                    if (context.mounted) {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) {
-                        return const ScannedInfo(
-                          barcode: '143127ce-0214-4d97-b2c3-cbab288ace99',
-                        );
-                      }));
-                    }
-                  } on PlatformException {
-                    barcodeScanRes = 'Failed to get platform version.';
-                  }
-                },
-                child: const Text("Scan qr code"))
-          ]),
-    );
+        bottomNavigationBar: BottomNavigationBar(
+            onTap: (selected) {
+              ref.watch(_selectedIndex.notifier).state = selected;
+            },
+            currentIndex: ref.watch(_selectedIndex),
+            unselectedItemColor: Colors.black,
+            selectedItemColor: Colors.green,
+            items: UserNavBar.values
+                .map((e) =>
+                    BottomNavigationBarItem(icon: e.icon, label: e.label))
+                .toList()),
+        body: switch (ref.watch(_selectedIndex)) {
+          0 => const UserDashboard(),
+          1 => const MarketPlaceView(),
+          _ => Container()
+        });
   }
 }
+
+enum UserNavBar {
+  dashboard('dashboard', Icon(Icons.dashboard)),
+  marketplace('market', Icon(Icons.shop)),
+  profile('profile', Icon(Icons.person));
+
+  final String label;
+  final Widget icon;
+  const UserNavBar(this.label, this.icon);
+}
+
+final _selectedIndex = StateProvider((ref) => 0);
