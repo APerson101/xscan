@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:uuid/uuid.dart';
@@ -88,7 +91,7 @@ class LoginView extends ConsumerWidget {
                           decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.password),
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.all(3.0),
+                                padding: const EdgeInsets.all(3),
                                 child: IconButton(
                                     onPressed: () => ref
                                         .watch(_isPasswordObscure.notifier)
@@ -111,7 +114,8 @@ class LoginView extends ConsumerWidget {
                                         // margin: const EdgeInsets.all(8),
                                         padding: const EdgeInsets.all(8),
                                         content: ListTile(
-                                          title: const Text("Contact admin"),
+                                          title: const Text(
+                                              "Contact admin on discord: @another_User"),
                                           trailing: Lottie.asset(
                                             'assets/animations/sad.json',
                                             width: 75,
@@ -141,6 +145,7 @@ class LoginView extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(15))),
                         child: const Text("Login"),
                       ),
+                      const SizedBox(height: 35),
                       Row(children: [
                         const Expanded(child: Divider()),
                         TextButton(
@@ -183,11 +188,13 @@ class SignUpPage extends ConsumerWidget {
   final emailController = TextEditingController();
   final addressController = TextEditingController();
   final phoneNumberController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final BuildContext ctx;
   final FToast toast = FToast();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     toast.init(ctx);
+    double padding = ref.watch(_selectedUserTypes) == UserTypes.user ? 10 : 3;
     ref.listen(signUpState, (previous, next) {
       if (previous != next) {
         switch (next) {
@@ -216,7 +223,7 @@ class SignUpPage extends ConsumerWidget {
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
-                          "Failed to create, please check details and try again"),
+                          "Failed to create, please check details and try again later"),
                     )));
           case SignUpStates.success:
             ref.watch(_shouldAbsord.notifier).state = true;
@@ -239,138 +246,232 @@ class SignUpPage extends ConsumerWidget {
       }
     });
     return Scaffold(
-      appBar: AppBar(),
+      appBar:
+          AppBar(centerTitle: true, title: const Text("Create new account")),
       body: AbsorbPointer(
         absorbing: ref.watch(_shouldAbsord),
         child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
-          children: [
-            DropdownButtonFormField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20))),
-                value: ref.watch(_selectedUserTypes),
-                items: UserTypes.values
-                    .map(
-                        (e) => DropdownMenuItem(value: e, child: Text(e.label)))
-                    .toList(),
-                onChanged: (selected) {
-                  if (selected != null) {
-                    ref.watch(_selectedUserTypes.notifier).state = selected;
-                  }
-                }),
-            TextFormField(
-              controller: nameController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  labelText: ref.watch(_selectedUserTypes) == UserTypes.user
-                      ? 'Enter your name'
-                      : "Enter business name"),
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: DropdownButtonFormField(
+                      decoration: InputDecoration(
+                          labelText: "Select user type",
+                          suffixIcon: const Icon(Icons.person),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20))),
+                      value: ref.watch(_selectedUserTypes),
+                      items: UserTypes.values
+                          .map((e) =>
+                              DropdownMenuItem(value: e, child: Text(e.label)))
+                          .toList(),
+                      onChanged: (selected) {
+                        if (selected != null) {
+                          ref.watch(_selectedUserTypes.notifier).state =
+                              selected;
+                        }
+                      }),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                        suffixIcon:
+                            ref.watch(_selectedUserTypes) == UserTypes.user
+                                ? const Icon(Icons.person)
+                                : const Icon(Icons.business),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        labelText:
+                            ref.watch(_selectedUserTypes) == UserTypes.user
+                                ? 'Enter your name'
+                                : "Enter business name"),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                        suffixIcon: const Icon(Icons.email),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        labelText: "Enter Email"),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: TextFormField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        suffixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        labelText: 'Enter Password'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: TextFormField(
+                    controller: confirmPasswordController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (psswrd) {
+                      if (psswrd != null) {
+                        if (psswrd == passwordController.text) {
+                          return null;
+                        } else {
+                          return "password does not match";
+                        }
+                      }
+                      return null;
+                    },
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        suffixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        labelText: 'Confirm Password'),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ref.watch(_selectedUserTypes) != UserTypes.user
+                      ? TextFormField(
+                          controller: descriptionController,
+                          decoration: InputDecoration(
+                              suffixIcon: const Icon(Icons.abc),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              labelText: "Enter business description"),
+                        )
+                      : const Gap(0),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ref.watch(_selectedUserTypes) != UserTypes.user
+                      ? TextFormField(
+                          controller: locationController,
+                          decoration: InputDecoration(
+                              suffixIcon: const Icon(Icons.location_on_sharp),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              labelText: "Enter business location"),
+                        )
+                      : const Gap(0),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ref.watch(_selectedUserTypes) != UserTypes.user
+                      ? TextFormField(
+                          controller: phoneNumberController,
+                          decoration: InputDecoration(
+                              suffixIcon: const Icon(Icons.phone),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              labelText: "Enter business phone number"),
+                        )
+                      : const Gap(0),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ref.watch(_selectedUserTypes) != UserTypes.user
+                      ? TextFormField(
+                          controller: addressController,
+                          decoration: InputDecoration(
+                              suffixIcon:
+                                  const Icon(Icons.quick_contacts_mail_sharp),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              labelText: "Enter business address"),
+                        )
+                      : const Gap(0),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ref.watch(_businessLogo) == null
+                      ? ElevatedButton(
+                          onPressed: () async {
+                            ref.watch(_businessLogo.notifier).state =
+                                await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
+                          },
+                          child: Text(
+                              ref.watch(_selectedUserTypes) != UserTypes.user
+                                  ? "Select logo"
+                                  : "Select Profile pic"))
+                      : Row(children: [
+                          TextButton(
+                              onPressed: () {
+                                ref.watch(_businessLogo.notifier).state = null;
+                              },
+                              child: const Text('change')),
+                          const SizedBox(width: 20),
+                          CircleAvatar(
+                            radius: 100,
+                            backgroundImage:
+                                FileImage(File(ref.watch(_businessLogo)!.path)),
+                          )
+                        ]),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        var model = switch (ref.watch(_selectedUserTypes)) {
+                          UserTypes.business => Brand(
+                              name: nameController.text,
+                              id: const Uuid().v4(),
+                              location: locationController.text,
+                              created: DateTime.now(),
+                              privateKey: 'privateKey',
+                              phone: phoneNumberController.text,
+                              address: addressController.text,
+                              email: emailController.text,
+                              logoImage: ref.watch(_businessLogo)!.path,
+                              accountID: 'accountID',
+                              catalog: []),
+                          UserTypes.manufacturer => Manufacturer(
+                              name: nameController.text,
+                              location: locationController.text,
+                              notes: descriptionController.text,
+                              logoImage: ref.watch(_businessLogo)!.path,
+                              id: const Uuid().v4(),
+                              privateKey: 'privateKey',
+                              email: emailController.text,
+                              accountID: 'accountID',
+                              productions: []),
+                          UserTypes.user => UserModel(
+                              name: nameController.text,
+                              privateKey: 'privateKey',
+                              accountID: 'accountID',
+                              email: emailController.text,
+                              id: const Uuid().v4(),
+                              created: DateTime.now(),
+                              profilePic: ref.watch(_businessLogo)!.path,
+                            ),
+                          _ => Container()
+                        };
+                        ref.watch(loginStateProvider.notifier).createAccount(
+                            emailController.text,
+                            passwordController.text,
+                            model,
+                            ref.read(_selectedUserTypes));
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          minimumSize: const Size(double.infinity, 60)),
+                      child: const Text("Continue")),
+                )
+              ],
             ),
-            TextFormField(
-              controller: emailController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  labelText: "Enter Email"),
-            ),
-            TextFormField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  labelText: 'Enter Password'),
-            ),
-            ref.watch(_selectedUserTypes) != UserTypes.user
-                ? TextFormField(
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        labelText: "Enter business description"),
-                  )
-                : Container(),
-            ref.watch(_selectedUserTypes) != UserTypes.user
-                ? TextFormField(
-                    controller: locationController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        labelText: "Enter business location"),
-                  )
-                : Container(),
-            ref.watch(_selectedUserTypes) != UserTypes.user
-                ? TextFormField(
-                    controller: phoneNumberController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        labelText: "Enter business phone number"),
-                  )
-                : Container(),
-            ref.watch(_selectedUserTypes) != UserTypes.user
-                ? TextFormField(
-                    controller: addressController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        labelText: "Enter business address"),
-                  )
-                : Container(),
-            ElevatedButton(
-                onPressed: () async {
-                  ref.watch(_businessLogo.notifier).state = await ImagePicker()
-                      .pickImage(source: ImageSource.gallery);
-                },
-                child: Text(ref.watch(_selectedUserTypes) != UserTypes.user
-                    ? "Select logo"
-                    : "Select Profile pic")),
-            ElevatedButton(
-                onPressed: () async {
-                  var model = switch (ref.watch(_selectedUserTypes)) {
-                    UserTypes.business => Brand(
-                        name: nameController.text,
-                        id: const Uuid().v4(),
-                        location: locationController.text,
-                        created: DateTime.now(),
-                        privateKey: 'privateKey',
-                        phone: phoneNumberController.text,
-                        address: addressController.text,
-                        email: emailController.text,
-                        logoImage: ref.watch(_businessLogo)!.path,
-                        accountID: 'accountID',
-                        catalog: []),
-                    UserTypes.manufacturer => Manufacturer(
-                        name: nameController.text,
-                        location: locationController.text,
-                        notes: descriptionController.text,
-                        logoImage: ref.watch(_businessLogo)!.path,
-                        id: const Uuid().v4(),
-                        privateKey: 'privateKey',
-                        accountID: 'accountID',
-                        productions: []),
-                    UserTypes.user => UserModel(
-                        name: nameController.text,
-                        privateKey: 'privateKey',
-                        accountID: 'accountID',
-                        email: emailController.text,
-                        id: const Uuid().v4(),
-                        created: DateTime.now(),
-                        profilePic: ref.watch(_businessLogo)!.path,
-                      ),
-                    _ => Container()
-                  };
-                  ref.watch(loginStateProvider.notifier).createAccount(
-                      emailController.text,
-                      passwordController.text,
-                      model,
-                      ref.read(_selectedUserTypes));
-                },
-                child: const Text("Continue"))
-          ],
-        )),
+          ),
+        ),
       ),
     );
   }
@@ -379,9 +480,7 @@ class SignUpPage extends ConsumerWidget {
 enum UserTypes {
   user(label: 'user'),
   business(label: 'brand'),
-  manufacturer(label: "manufacturer"),
-  warehouse(label: "warehouse"),
-  employee(label: "employee");
+  manufacturer(label: "manufacturer");
 
   const UserTypes({required this.label});
   final String label;

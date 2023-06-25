@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:xscan/worker/models/scanmodel.dart';
 
 import '../models/brand.dart';
@@ -56,7 +57,7 @@ class BrandPendingView extends ConsumerWidget {
                           });
                     },
                     title: Text(item.productName!),
-                    subtitle: Text(item.timeAdded.toString()),
+                    subtitle: Text(DateFormat.yMMMEd().format(item.timeAdded!)),
                     trailing: ref
                         .watch(
                             getBusinessNameFromString(item.scanner!.businessID))

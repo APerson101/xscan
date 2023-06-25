@@ -7,6 +7,8 @@ import 'package:xscan/brand%20view/models/manufacturer.dart';
 import 'package:xscan/manufacturer/models/quotation.dart';
 
 import '../../brand view/models/brand_manufacturer.dart';
+import '../screens/manu_notifications.dart';
+import 'manu_providers.dart';
 
 part 'accept_offer_provider.g.dart';
 
@@ -44,14 +46,18 @@ class AcceptOffer extends _$AcceptOffer {
 @riverpod
 class SendQuotation extends _$SendQuotation {
   @override
-  build(int amount, String brandID, Manufacturer manufacturer,
+  FutureOr<int> build(int amount, String brandID, Manufacturer manufacturer,
       BrandManufaturer transaction) async {
     var db = GetIt.I<DataBase>();
     (await db.sendQuotation(QuotationModel(
         amount: amount,
         brandID: brandID,
         transaction: transaction,
+        brandAgreed: false,
         id: const Uuid().v4(),
         manu: manufacturer)));
+    ref.watch(quotationSentProvider.notifier).state = 1;
+    ref.invalidate(loadManuInfoProvider);
+    return 1;
   }
 }

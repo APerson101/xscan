@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xscan/manufacturer/screens/manu_dashboard.dart';
@@ -30,17 +31,18 @@ class _MainBody extends ConsumerWidget {
       var index = ref.watch(_selectedIndex);
       switch (index) {
         case 0:
-          return ManuDashboard(data: data);
+          return ManuDashboard(data: data.$1);
         case 1:
-          return ManuNotifications(data: data);
+          return ManuNotifications(data: data.$1, notifications: data.$2);
         case 2:
-          return PeopleView(data: data);
+          return PeopleView(data: data.$1);
         case 3:
-          return ManuProfile(data: data);
+          return ManuProfile(data: data.$1);
         default:
           return const Placeholder();
       }
     }, error: (er, st) {
+      debugPrintStack(stackTrace: st);
       return const Center(child: Text("Failed to load"));
     }, loading: () {
       return const Center(child: CircularProgressIndicator.adaptive());
@@ -60,27 +62,30 @@ class _BottomNavBar extends ConsumerWidget {
           ref.watch(_selectedIndex.notifier).state = index;
         },
         items: _ManuBottomNavBar.values.map((e) {
-          IconData icon = Icons.abc;
+          Widget icon = const Icon(Icons.abc);
           String label = '';
           switch (e) {
             case _ManuBottomNavBar.dashboard:
-              icon = Icons.dashboard;
+              icon = const Icon(Icons.dashboard);
               label = 'Dashbaord';
               break;
             case _ManuBottomNavBar.pending:
-              icon = Icons.notifications;
+              icon = badges.Badge(
+                  showBadge: ref.watch(notificationsNumber) > 0,
+                  badgeContent: Text(ref.watch(notificationsNumber).toString()),
+                  child: const Icon(Icons.notifications));
               label = 'Notifications';
               break;
             case _ManuBottomNavBar.profile:
-              icon = Icons.person;
+              icon = const Icon(Icons.person);
               label = 'Profile';
               break;
             case _ManuBottomNavBar.people:
-              icon = Icons.people;
+              icon = const Icon(Icons.people);
               label = 'Employees';
               break;
           }
-          return BottomNavigationBarItem(icon: Icon(icon), label: label);
+          return BottomNavigationBarItem(icon: icon, label: label);
         }).toList());
   }
 }
@@ -88,3 +93,4 @@ class _BottomNavBar extends ConsumerWidget {
 enum _ManuBottomNavBar { dashboard, pending, people, profile }
 
 final _selectedIndex = StateProvider((ref) => 0);
+final notificationsNumber = StateProvider((ref) => 0);

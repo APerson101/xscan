@@ -18,16 +18,16 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseAuth.instance.useAuthEmulator('192.168.8.100', 9099);
-  await FirebaseStorage.instance.useStorageEmulator('192.168.8.100', 9199);
+  await FirebaseAuth.instance.useAuthEmulator('172.17.15.187', 9099);
+  await FirebaseStorage.instance.useStorageEmulator('172.17.15.187', 9199);
   FirebaseFirestore.instance.settings = const Settings(
-      host: '192.168.1.43:8080', sslEnabled: false, persistenceEnabled: false);
+      host: '172.17.15.187:8080', sslEnabled: false, persistenceEnabled: false);
   GetIt.I.registerSingleton<FirebaseStorage>(FirebaseStorage.instance);
   GetIt.I.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
   GetIt.I.registerSingleton<FirebaseFirestore>(
-      FirebaseFirestore.instance..useFirestoreEmulator('192.168.8.100', 8080));
+      FirebaseFirestore.instance..useFirestoreEmulator('172.17.15.187', 8080));
   GetIt.I.registerSingleton<FirebaseFunctions>(
-      FirebaseFunctions.instance..useFunctionsEmulator('192.168.8.100', 5001));
+      FirebaseFunctions.instance..useFunctionsEmulator('172.17.15.187', 5001));
   GetIt.I.registerSingleton<DataBase>(DataBase(
       auth: GetIt.I<FirebaseAuth>(),
       functions: GetIt.I<FirebaseFunctions>(),

@@ -10,12 +10,14 @@ class QuotationModel {
   String id;
   Manufacturer manu;
   BrandManufaturer transaction;
+  bool brandAgreed;
   QuotationModel({
     required this.amount,
     required this.brandID,
     required this.id,
     required this.manu,
     required this.transaction,
+    required this.brandAgreed,
   });
 
   QuotationModel copyWith({
@@ -24,6 +26,7 @@ class QuotationModel {
     String? id,
     Manufacturer? manu,
     BrandManufaturer? transaction,
+    bool? brandAgreed,
   }) {
     return QuotationModel(
       amount: amount ?? this.amount,
@@ -31,6 +34,7 @@ class QuotationModel {
       id: id ?? this.id,
       manu: manu ?? this.manu,
       transaction: transaction ?? this.transaction,
+      brandAgreed: brandAgreed ?? this.brandAgreed,
     );
   }
 
@@ -41,6 +45,7 @@ class QuotationModel {
       'id': id,
       'manu': manu.toMap(),
       'transaction': transaction.toMap(),
+      'brandAgreed': brandAgreed,
     };
   }
 
@@ -51,6 +56,7 @@ class QuotationModel {
       id: map['id'] ?? '',
       manu: Manufacturer.fromMap(map['manu']),
       transaction: BrandManufaturer.fromMap(map['transaction']),
+      brandAgreed: map['brandAgreed'] ?? false,
     );
   }
 
@@ -61,7 +67,7 @@ class QuotationModel {
 
   @override
   String toString() {
-    return 'QuotationModel(amount: $amount, brandID: $brandID, id: $id, manu: $manu, transaction: $transaction)';
+    return 'QuotationModel(amount: $amount, brandID: $brandID, id: $id, manu: $manu, transaction: $transaction, brandAgreed: $brandAgreed)';
   }
 
   @override
@@ -73,7 +79,8 @@ class QuotationModel {
         other.brandID == brandID &&
         other.id == id &&
         other.manu == manu &&
-        other.transaction == transaction;
+        other.transaction == transaction &&
+        other.brandAgreed == brandAgreed;
   }
 
   @override
@@ -82,6 +89,7 @@ class QuotationModel {
         brandID.hashCode ^
         id.hashCode ^
         manu.hashCode ^
-        transaction.hashCode;
+        transaction.hashCode ^
+        brandAgreed.hashCode;
   }
 }

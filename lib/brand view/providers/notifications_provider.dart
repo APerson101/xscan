@@ -36,6 +36,7 @@ acceptQuotation(AcceptQuotationRef ref, QuotationModel quotation, Brand brand,
       transaction.id,
       Agreement(product: transaction.product, agreementID: transaction.id),
       transaction.manufacturerID);
+  await db.removeQuotation(id: quotation.id);
 
   // send notification to manufacturer to start production
 }

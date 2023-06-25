@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xscan/brand%20view/providers/brand_providers.dart';
@@ -14,11 +15,7 @@ class BrandHomeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         bottomNavigationBar: const BrandBottomNavBar(),
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text("Welcome back!"),
-        ),
-        body: SizedBox.expand(child: _CurrentView(id: id)));
+        body: SafeArea(child: SizedBox.expand(child: _CurrentView(id: id))));
   }
 }
 
@@ -27,7 +24,9 @@ class _CurrentView extends ConsumerWidget {
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(getBrandInfoProvider(id)).when(data: (brand) {
+    return ref.watch(getBrandInfoProviderProvider(id)).when(data: (data) {
+      var (brand, notifications) = data;
+      debugPrint(notifications.length.toString());
       switch (ref.watch(_brandDashboardcurrentIndex)) {
         case 0:
           return BDashboardView(brand: brand);
@@ -62,30 +61,36 @@ class BrandBottomNavBar extends ConsumerWidget {
         unselectedItemColor: Colors.black,
         selectedItemColor: Colors.blue,
         items: _BottomNavBarItems.values.map((e) {
-          IconData icon = Icons.abc_outlined;
+          Widget icon = const Icon(Icons.abc_outlined);
           String label = '';
           switch (e) {
             case _BottomNavBarItems.dashboard:
-              icon = Icons.dashboard;
+              icon = const Icon(Icons.dashboard);
               label = 'Dashboard';
               break;
             case _BottomNavBarItems.profile:
-              icon = Icons.person;
+              icon = const Icon(Icons.person);
               label = 'Profle';
               break;
             case _BottomNavBarItems.products:
-              icon = Icons.adjust;
+              icon = const Icon(Icons.adjust);
               label = 'Products';
 
             case _BottomNavBarItems.notifications:
-              icon = Icons.notifications;
+              icon = badges.Badge(
+                badgeContent: Text(ref.watch(notLength).toString()),
+                showBadge: ref.watch(notLength) != null,
+                child: const Icon(Icons.notifications),
+              );
               label = 'Notifications';
               break;
           }
-          return BottomNavigationBarItem(icon: Icon(icon), label: label);
+          return BottomNavigationBarItem(icon: icon, label: label);
         }).toList());
   }
 }
+
+final notLength = StateProvider<int?>((ref) => null);
 
 enum _BottomNavBarItems { dashboard, products, notifications, profile }
 

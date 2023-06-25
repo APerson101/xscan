@@ -1,75 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:xscan/brand%20view/models/product.dart';
+import 'package:intl/intl.dart';
 
-import '../../brand view/models/brand.dart';
+import '../../brand view/models/brand_manufacturer.dart';
 import '../../brand view/models/manufacturer.dart';
 import '../providers/accept_offer_provider.dart';
-import '../providers/manu_providers.dart';
 
 class ManuNotifications extends ConsumerWidget {
-  const ManuNotifications({super.key, required this.data});
+  const ManuNotifications(
+      {super.key, required this.data, required this.notifications});
   final Manufacturer data;
+  final List<BrandManufaturer> notifications;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen(acceptOfferProvider, (previous, next) {
-      ref.watch(acceptOfferProvider).when(data: (status) {
-        if (status == AcceptOfferCreationState.success) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text("Success")));
-        }
-      }, error: (Object error, StackTrace stackTrace) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("ERROR")));
-      }, loading: () {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("LOADING")));
-      });
+    ref.listen(quotationSentProvider, (previous, next) {
+      if (previous != next) {
+        // show stuff
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Quotation successfully sent")));
+        Navigator.of(context).pop();
+      }
     });
-    return ref.watch(getPendingRequests(data.id)).when(data: (requests) {
-      return SingleChildScrollView(
-        child: Column(
-          children: requests.map((e) {
-            var brandName =
-                ref.watch(getBrand(e.brandID)).when(data: (Brand data) {
-              return data.name;
-            }, error: (Object error, StackTrace stackTrace) {
-              return 'error';
-            }, loading: () {
-              return '...';
-            });
-            var productName =
-                ref.watch(getProduct(e.productID)).when(data: (Product? data) {
-              return data?.name ?? "";
-            }, error: (Object error, StackTrace stackTrace) {
-              return 'error';
-            }, loading: () {
-              return '...';
-            });
 
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+    return SingleChildScrollView(
+      child: Column(
+        children: notifications.map((e) {
+          var brandName = e.product.brandOwner;
+
+          var productName = e.product.name;
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
                   child: ListTile(
-                    title: Text(e.dateCreated.toString()),
-                    trailing: Text("${e.quantity}"),
-                    leading: Text(brandName),
-                    subtitle: Text(productName),
+                    subtitle: Text(DateFormat.yMMMEd().format(e.dateCreated)),
+                    trailing: Text("Quantity: ${e.quantity}"),
+                    leading: DecoratedBox(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.red),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(Icons.notifications),
+                      ),
+                    ),
+                    title: Text(
+                        'Product name: $productName\nBrand name: $brandName'),
                   ),
                 ),
-                ElevatedButton(
-                    onPressed: () async {
-                      var amountText = TextEditingController();
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Material(
-                              child: Column(
-                                children: [
-                                  SizedBox(
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    var amountText = TextEditingController();
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return Scaffold(
+                            appBar: AppBar(),
+                            persistentFooterButtons: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  ref.watch(sendQuotationProvider(
+                                      int.parse(amountText.text),
+                                      e.brandID,
+                                      data,
+                                      e));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    minimumSize:
+                                        const Size(double.infinity, 60)),
+                                child: const Text("confirm"),
+                              )
+                            ],
+                            body: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Center(
+                                  child: SizedBox(
                                       height: 200,
-                                      width: 200,
+                                      width: 400,
                                       child: TextFormField(
                                         controller: amountText,
                                         decoration: InputDecoration(
@@ -78,36 +89,19 @@ class ManuNotifications extends ConsumerWidget {
                                                 borderRadius:
                                                     BorderRadius.circular(20))),
                                       )),
-                                  ElevatedButton(
-                                      onPressed: () async {
-                                        ref.watch(sendQuotationProvider(
-                                            int.parse(amountText.text),
-                                            e.brandID,
-                                            data,
-                                            e));
-                                      },
-                                      child: const Text("confirm"))
-                                ],
-                              ),
-                            );
-                          });
-
-                      // ref
-                      //     .watch(acceptOfferProvider.notifier)
-                      //     .acceptOffer(e.id, e.product, e.manufacturerID);
-                    },
-                    child: const Text("Send  quotation"))
-              ],
-            );
-          }).toList(),
-        ),
-      );
-    }, error: (er, st) {
-      return const Center(
-        child: Text("Failed to load pending requests"),
-      );
-    }, loading: () {
-      return const CircularProgressIndicator.adaptive();
-    });
+                                ),
+                              ],
+                            ),
+                          );
+                        });
+                  },
+                  child: const Text("Send  quotation"))
+            ],
+          );
+        }).toList(),
+      ),
+    );
   }
 }
+
+final quotationSentProvider = StateProvider((ref) => 0);

@@ -69,6 +69,11 @@ class ItemOwnershipHistory {
   int get hashCode {
     return id.hashCode ^ barcode.hashCode ^ brandID.hashCode ^ owners.hashCode;
   }
+
+  @override
+  String toString() {
+    return 'ItemOwnershipHistory(id: $id, barcode: $barcode, brandID: $brandID, owners: $owners)';
+  }
 }
 
 class Owner {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xscan/brand%20view/providers/login_provider.dart';
 import 'package:xscan/user/market_place_view.dart';
 import 'package:xscan/user/user_assets.dart';
 import 'package:xscan/user/user_dashboard.dart';
@@ -22,10 +23,15 @@ class UserMain extends ConsumerWidget {
                     BottomNavigationBarItem(icon: e.icon, label: e.label))
                 .toList()),
         body: switch (ref.watch(_selectedIndex)) {
-          0 => const UserDashboard(),
-          1 => const MarketPlaceView(),
+          0 => UserDashboard(id: id),
+          1 => MarketPlaceView(id: id),
           2 => UserAssets(id: id),
-          _ => Container()
+          _ => Center(
+              child: ElevatedButton(
+                  onPressed: () {
+                    ref.watch(loginStateProvider.notifier).logout();
+                  },
+                  child: const Text("Logout")))
         });
   }
 }

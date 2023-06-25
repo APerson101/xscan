@@ -102,7 +102,18 @@ export const transferHbarEscrow = functions.https.onCall(async (req) => {
   );
 });
 
-
+export const tranfserHbar = functions.https.onCall(async (req) => {
+  const receiverID = req.receiverID;
+  const senderID = req.senderID;
+  const senderPrivateKey = req.senderPK;
+  const amount = req.amount;
+  await hash.sendFunds(getClient(),
+    AccountId.fromString(senderID),
+    PrivateKey.fromString(senderPrivateKey),
+    amount,
+    AccountId.fromString(receiverID)
+  );
+});
 
 export const getAccountBalance = functions.https.onCall(async (req) => {
   const accountID = req.accountID;

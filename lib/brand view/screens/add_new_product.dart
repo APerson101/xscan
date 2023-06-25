@@ -15,7 +15,6 @@ class AddNewProductView extends ConsumerWidget {
   final formKey = GlobalKey<FormState>();
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
-  final selectedManufacturer = StateProvider((ref) => 0);
   final selectedImage = StateProvider<List<XFile>?>((ref) => null);
   final Brand brand;
   @override
@@ -49,91 +48,80 @@ class AddNewProductView extends ConsumerWidget {
     });
 
     return Scaffold(
+        persistentFooterButtons: [
+          ElevatedButton(
+            onPressed: () async {
+              var product = Product(
+                created: DateTime.now(),
+                brandOwner: brand.name,
+                id: const Uuid().v4().toString(),
+                imageLink: ref
+                    .watch(selectedImage)!
+                    .map<String>((e) => e.path)
+                    .toList(),
+                name: productNameController.text,
+                notes: productDescriptionController.text,
+              );
+              ref
+                  .watch(productCreationStateProvider.notifier)
+                  .createProduct(product, brand, ref.watch(selectedImage)!);
+            },
+            style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 60)),
+            child: const Text("Create new Product"),
+          )
+        ],
         appBar: AppBar(
           centerTitle: true,
           title: const Text("Add new Product"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: productNameController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30))),
-                  ),
-                  TextFormField(
-                    controller: productDescriptionController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30))),
-                  ),
-                  ref.watch(selectedImage) == null
-                      ? ElevatedButton(
-                          onPressed: () async {
-                            await pickImages();
-                          },
-                          child: const Text("select Images"))
-                      : SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(children: [
-                            ElevatedButton(
-                                onPressed: () async {
-                                  await pickImages();
-                                },
-                                child: const Text("Change Selection")),
-                            ...ref
-                                .watch(selectedImage)!
-                                .map((e) => Image.file(
-                                      File(e.path),
-                                      width: 250,
-                                      height: 250,
-                                      fit: BoxFit.contain,
-                                    ))
-                                .toList()
-                          ]),
-                        ),
-                  DropdownButton<int>(
-                      value: ref.watch(selectedManufacturer),
-                      items: [
-                        ...List.generate(
-                            5,
-                            (index) => DropdownMenuItem(
-                                value: index,
-                                child: Text("Manufactuer ${index + 1}")))
-                      ],
-                      onChanged: (newlySelected) {
-                        newlySelected != null
-                            ? ref.watch(selectedManufacturer.notifier).state =
-                                newlySelected
-                            : null;
-                      }),
-                  ElevatedButton(
-                      onPressed: () async {
-                        // validate and save
-                        var product = Product(
-                          created: DateTime.now(),
-                          brandOwner: brand.name,
-                          id: const Uuid().v4().toString(),
-                          imageLink: ref
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextFormField(
+                  controller: productNameController,
+                  decoration: InputDecoration(
+                      hintText: "Enter product name",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                ),
+                TextFormField(
+                  controller: productDescriptionController,
+                  decoration: InputDecoration(
+                      hintText: "Enter product description",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                ),
+                ref.watch(selectedImage) == null
+                    ? ElevatedButton(
+                        onPressed: () async {
+                          await pickImages();
+                        },
+                        child: const Text("Select product Images"))
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(children: [
+                          ElevatedButton(
+                              onPressed: () async {
+                                await pickImages();
+                              },
+                              child: const Text("Change Selection")),
+                          ...ref
                               .watch(selectedImage)!
-                              .map<String>((e) => e.path)
-                              .toList(),
-                          name: productNameController.text,
-                          notes: productDescriptionController.text,
-                        );
-                        ref
-                            .watch(productCreationStateProvider.notifier)
-                            .createProduct(
-                                product, brand, ref.watch(selectedImage)!);
-                      },
-                      child: const Text("Create new Product"))
-                ],
-              ),
+                              .map((e) => Image.file(
+                                    File(e.path),
+                                    width: 250,
+                                    height: 250,
+                                    fit: BoxFit.contain,
+                                  ))
+                              .toList()
+                        ]),
+                      ),
+              ],
             ),
           ),
         ));

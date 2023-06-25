@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xscan/all/cross_widgets.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
 import 'package:xscan/manufacturer/screens/pending_approval.dart';
 
@@ -15,49 +16,37 @@ class ManuDashboard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Stack(
-        children: [
-          Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 75,
-              child: _ActionButtons(data)),
-          const Positioned(
-              left: 0,
-              right: 0,
-              top: 100,
-              child: Row(
-                children: [
-                  Expanded(child: Divider()),
-                  Text("Your company summary"),
-                  Expanded(child: Divider()),
-                ],
-              )),
-          Positioned(
-              top: 130,
-              left: 0,
-              right: 0,
-              height: 330,
-              child: _StatisticsView(data)),
-          const Positioned(
-              left: 0,
-              right: 0,
-              top: 460,
-              child: Row(
-                children: [
-                  Expanded(child: Divider()),
-                  Text("Most recently Scanned"),
-                  Expanded(child: Divider()),
-                ],
-              )),
-          Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 200,
-              child: _MostRecentScanned(data)),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+                height: 250,
+                child: Wallet(
+                  accountID: data.accountID,
+                  image: data.logoImage,
+                  name: data.name,
+                  pk: data.privateKey,
+                )),
+            const SizedBox(
+                child: Row(
+              children: [
+                Expanded(child: Divider()),
+                Text("Your company summary"),
+                Expanded(child: Divider()),
+              ],
+            )),
+            SizedBox(height: 330, child: _StatisticsView(data)),
+            const SizedBox(
+                child: Row(
+              children: [
+                Expanded(child: Divider()),
+                Text("Most recently Scanned"),
+                Expanded(child: Divider()),
+              ],
+            )),
+            SizedBox(height: 200, child: _MostRecentScanned(data)),
+          ],
+        ),
       ),
     );
   }
@@ -86,10 +75,21 @@ class _StatisticsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var numberWidget =
         ref.watch(getEmployees(manu.id)).when(data: (List<Employee> data) {
-      return ListTile(
-        tileColor: const Color.fromRGBO(255, 211, 253, 1),
-        title: const Text("Number of employees is "),
-        trailing: Text(data.length.toString()),
+      return Card(
+        child: ListTile(
+          leading: DecoratedBox(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.pink.shade300),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(Icons.people, color: Colors.white),
+            ),
+          ),
+          tileColor: const Color.fromRGBO(255, 211, 253, 1),
+          title: const Text("Number of employees is "),
+          trailing: Text(data.length.toString()),
+        ),
       );
     }, error: (Object error, StackTrace stackTrace) {
       return const Text("Failed to load");
@@ -98,10 +98,22 @@ class _StatisticsView extends ConsumerWidget {
     });
     var todayWidget =
         ref.watch(getThingsProducedToday(manu.id)).when(data: (int data) {
-      return ListTile(
-        tileColor: const Color.fromRGBO(255, 231, 211, 1),
-        title: const Text("Number of things produced today is "),
-        trailing: Text(data.toString()),
+      return Card(
+        child: ListTile(
+          leading: DecoratedBox(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color.fromRGBO(112, 63, 23, 1)),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child:
+                  Icon(Icons.calendar_view_month_rounded, color: Colors.white),
+            ),
+          ),
+          tileColor: const Color.fromRGBO(255, 231, 211, 1),
+          title: const Text("Number of things produced today is "),
+          trailing: Text(data.toString()),
+        ),
       );
     }, error: (Object error, StackTrace stackTrace) {
       return const Text("Failed to load");
@@ -110,18 +122,29 @@ class _StatisticsView extends ConsumerWidget {
     });
     var pendingWidget = ref.watch(getPendingRequestProvider(manu.id)).when(
         data: (List<ScanModel> data) {
-      return ListTile(
-        tileColor: const Color.fromRGBO(228, 255, 222, 1),
-        onTap: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return ManuPendingApprovalView(
-              models: data,
-              manufacturer: manu,
-            );
-          }));
-        },
-        title: const Text("Items Awaiting your approval:"),
-        trailing: Text(data.length.toString()),
+      return Card(
+        child: ListTile(
+          leading: DecoratedBox(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.green.shade400),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(Icons.timer, color: Colors.white),
+            ),
+          ),
+          tileColor: const Color.fromRGBO(228, 255, 222, 1),
+          onTap: () async {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return ManuPendingApprovalView(
+                models: data,
+                manufacturer: manu,
+              );
+            }));
+          },
+          title: const Text("Items Awaiting your approval:"),
+          trailing: Text(data.length.toString()),
+        ),
       );
     }, error: (Object error, StackTrace stackTrace) {
       return const Text("Failed to load");
@@ -135,6 +158,15 @@ class _StatisticsView extends ConsumerWidget {
           children: [
             todayWidget,
             ListTile(
+              leading: DecoratedBox(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.blue.shade400),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.house, color: Colors.white),
+                ),
+              ),
               tileColor: const Color.fromRGBO(208, 255, 254, 1),
               title: const Text("Number of items in productions: "),
               trailing: Text(manu.productions.length.toString()),

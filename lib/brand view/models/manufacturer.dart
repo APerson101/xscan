@@ -11,6 +11,7 @@ class Manufacturer {
   String privateKey;
   String accountID;
   String logoImage;
+  String email;
   List<Agreement> productions;
   Manufacturer({
     required this.name,
@@ -20,6 +21,7 @@ class Manufacturer {
     required this.privateKey,
     required this.accountID,
     required this.logoImage,
+    required this.email,
     required this.productions,
   });
 
@@ -31,6 +33,7 @@ class Manufacturer {
     String? privateKey,
     String? accountID,
     String? logoImage,
+    String? email,
     List<Agreement>? productions,
   }) {
     return Manufacturer(
@@ -41,6 +44,7 @@ class Manufacturer {
       privateKey: privateKey ?? this.privateKey,
       accountID: accountID ?? this.accountID,
       logoImage: logoImage ?? this.logoImage,
+      email: email ?? this.email,
       productions: productions ?? this.productions,
     );
   }
@@ -54,6 +58,7 @@ class Manufacturer {
       'privateKey': privateKey,
       'accountID': accountID,
       'logoImage': logoImage,
+      'email': email,
       'productions': productions.map((x) => x.toMap()).toList(),
     };
   }
@@ -67,6 +72,7 @@ class Manufacturer {
       privateKey: map['privateKey'] ?? '',
       accountID: map['accountID'] ?? '',
       logoImage: map['logoImage'] ?? '',
+      email: map['email'] ?? '',
       productions: List<Agreement>.from(
           map['productions']?.map((x) => Agreement.fromMap(x))),
     );
@@ -79,7 +85,7 @@ class Manufacturer {
 
   @override
   String toString() {
-    return 'Manufacturer(name: $name, location: $location, notes: $notes, id: $id, privateKey: $privateKey, accountID: $accountID, logoImage: $logoImage, productions: $productions)';
+    return 'Manufacturer(name: $name, location: $location, notes: $notes, id: $id, privateKey: $privateKey, accountID: $accountID, logoImage: $logoImage, email: $email, productions: $productions)';
   }
 
   @override
@@ -94,6 +100,7 @@ class Manufacturer {
         other.privateKey == privateKey &&
         other.accountID == accountID &&
         other.logoImage == logoImage &&
+        other.email == email &&
         listEquals(other.productions, productions);
   }
 
@@ -106,6 +113,7 @@ class Manufacturer {
         privateKey.hashCode ^
         accountID.hashCode ^
         logoImage.hashCode ^
+        email.hashCode ^
         productions.hashCode;
   }
 }

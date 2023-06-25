@@ -21,7 +21,7 @@ final acceptOfferProvider = AutoDisposeAsyncNotifierProvider<AcceptOffer,
 );
 
 typedef _$AcceptOffer = AutoDisposeAsyncNotifier<AcceptOfferCreationState>;
-String _$sendQuotationHash() => r'c76551f19e51fa2169ac0ed8cba41cf5c9e9181a';
+String _$sendQuotationHash() => r'04f0c555c0d41f667a99c9849bfeddbdb6f2e617';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -44,13 +44,13 @@ class _SystemHash {
   }
 }
 
-abstract class _$SendQuotation extends BuildlessAutoDisposeNotifier<dynamic> {
+abstract class _$SendQuotation extends BuildlessAutoDisposeAsyncNotifier<int> {
   late final int amount;
   late final String brandID;
   late final Manufacturer manufacturer;
   late final BrandManufaturer transaction;
 
-  dynamic build(
+  FutureOr<int> build(
     int amount,
     String brandID,
     Manufacturer manufacturer,
@@ -63,7 +63,7 @@ abstract class _$SendQuotation extends BuildlessAutoDisposeNotifier<dynamic> {
 const sendQuotationProvider = SendQuotationFamily();
 
 /// See also [SendQuotation].
-class SendQuotationFamily extends Family<dynamic> {
+class SendQuotationFamily extends Family<AsyncValue<int>> {
   /// See also [SendQuotation].
   const SendQuotationFamily();
 
@@ -111,7 +111,7 @@ class SendQuotationFamily extends Family<dynamic> {
 
 /// See also [SendQuotation].
 class SendQuotationProvider
-    extends AutoDisposeNotifierProviderImpl<SendQuotation, dynamic> {
+    extends AutoDisposeAsyncNotifierProviderImpl<SendQuotation, int> {
   /// See also [SendQuotation].
   SendQuotationProvider(
     this.amount,
@@ -161,7 +161,7 @@ class SendQuotationProvider
   }
 
   @override
-  dynamic runNotifierBuild(
+  FutureOr<int> runNotifierBuild(
     covariant SendQuotation notifier,
   ) {
     return notifier.build(

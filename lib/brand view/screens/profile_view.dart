@@ -10,25 +10,66 @@ class ProfileView extends ConsumerWidget {
   final Brand brand;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        const Text("Business Name"),
-        const Text("Business Location"),
-        const Text("RegisteredEmail"),
+    return Scaffold(
+      persistentFooterButtons: [
         ElevatedButton(
-            onPressed: () async {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return AddSalesStaff(brand: brand);
-              }));
-            },
-            child: const Text("Add employee")),
-        Image.network(brand.logoImage),
-        ElevatedButton(
-            onPressed: () {
-              ref.watch(loginStateProvider.notifier).logout();
-            },
-            child: const Text("Log out"))
+          onPressed: () {
+            ref.watch(loginStateProvider.notifier).logout();
+          },
+          style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 60),
+              backgroundColor: Colors.red),
+          child: const Text("Log out"),
+        )
       ],
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Your profile"),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          CircleAvatar(
+            radius: 70,
+            backgroundImage: NetworkImage(brand.logoImage),
+          ),
+          Card(
+              child: ListTile(
+            title: Text(brand.name),
+            subtitle: const Text("Brand name"),
+            leading: const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Icon(Icons.person),
+            ),
+          )),
+          Card(
+              child: ListTile(
+                  leading: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.location_history),
+                  ),
+                  subtitle: const Text("Business Location"),
+                  title: Text(brand.location))),
+          Card(
+            child: ListTile(
+              subtitle: const Text("Registered Email"),
+              title: Text(brand.email),
+              leading: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.email),
+              ),
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return AddSalesStaff(brand: brand);
+                }));
+              },
+              child: const Text("Add Sales employee")),
+        ],
+      ),
     );
   }
 }

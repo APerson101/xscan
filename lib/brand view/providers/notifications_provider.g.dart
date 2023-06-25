@@ -112,7 +112,7 @@ class GetNotificationsProvider
   }
 }
 
-String _$acceptQuotationHash() => r'2d3755be2fae9390171dd7c2d4fe3cbc174009d1';
+String _$acceptQuotationHash() => r'9bc4930c2bed694aca518cca2221697eba774a9e';
 typedef AcceptQuotationRef = AutoDisposeProviderRef<dynamic>;
 
 /// See also [acceptQuotation].

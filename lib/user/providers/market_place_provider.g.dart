@@ -110,29 +110,7 @@ class GetUserFromIdProvider extends AutoDisposeFutureProvider<UserModel> {
   }
 }
 
-String _$loadUserAssetsHash() => r'ed4aa524985815a5dad350418d9b95699237a867';
-
-/// See also [loadUserAssets].
-@ProviderFor(loadUserAssets)
-final loadUserAssetsProvider = AutoDisposeFutureProvider<
-    List<
-        ({
-          List<String> imageLinks,
-          ItemOwnershipHistory ownership,
-          String productName,
-          String review,
-          List<int> stars,
-          Transfer tranfer
-        })>>.internal(
-  loadUserAssets,
-  name: r'loadUserAssetsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$loadUserAssetsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
+String _$loadUserAssetsHash() => r'8d547d491e50e192df7a904cef64f2899a59bc2b';
 typedef LoadUserAssetsRef = AutoDisposeFutureProviderRef<
     List<
         ({
@@ -143,7 +121,106 @@ typedef LoadUserAssetsRef = AutoDisposeFutureProviderRef<
           List<int> stars,
           Transfer tranfer
         })>>;
-String _$putAssetForSaleHash() => r'41e228821953bf134a06a814c1da5f64ab467cb4';
+
+/// See also [loadUserAssets].
+@ProviderFor(loadUserAssets)
+const loadUserAssetsProvider = LoadUserAssetsFamily();
+
+/// See also [loadUserAssets].
+class LoadUserAssetsFamily extends Family<
+    AsyncValue<
+        List<
+            ({
+              List<String> imageLinks,
+              ItemOwnershipHistory ownership,
+              String productName,
+              String review,
+              List<int> stars,
+              Transfer tranfer
+            })>>> {
+  /// See also [loadUserAssets].
+  const LoadUserAssetsFamily();
+
+  /// See also [loadUserAssets].
+  LoadUserAssetsProvider call(
+    String accountID,
+  ) {
+    return LoadUserAssetsProvider(
+      accountID,
+    );
+  }
+
+  @override
+  LoadUserAssetsProvider getProviderOverride(
+    covariant LoadUserAssetsProvider provider,
+  ) {
+    return call(
+      provider.accountID,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'loadUserAssetsProvider';
+}
+
+/// See also [loadUserAssets].
+class LoadUserAssetsProvider extends AutoDisposeFutureProvider<
+    List<
+        ({
+          List<String> imageLinks,
+          ItemOwnershipHistory ownership,
+          String productName,
+          String review,
+          List<int> stars,
+          Transfer tranfer
+        })>> {
+  /// See also [loadUserAssets].
+  LoadUserAssetsProvider(
+    this.accountID,
+  ) : super.internal(
+          (ref) => loadUserAssets(
+            ref,
+            accountID,
+          ),
+          from: loadUserAssetsProvider,
+          name: r'loadUserAssetsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$loadUserAssetsHash,
+          dependencies: LoadUserAssetsFamily._dependencies,
+          allTransitiveDependencies:
+              LoadUserAssetsFamily._allTransitiveDependencies,
+        );
+
+  final String accountID;
+
+  @override
+  bool operator ==(Object other) {
+    return other is LoadUserAssetsProvider && other.accountID == accountID;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, accountID.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$putAssetForSaleHash() => r'7e493578917cff00546925e6477621f261820b37';
 typedef PutAssetForSaleRef = AutoDisposeFutureProviderRef<dynamic>;
 
 /// See also [putAssetForSale].
@@ -160,11 +237,13 @@ class PutAssetForSaleFamily extends Family<AsyncValue<dynamic>> {
     UserModel model,
     int amount,
     String barcode,
+    String nftID,
   ) {
     return PutAssetForSaleProvider(
       model,
       amount,
       barcode,
+      nftID,
     );
   }
 
@@ -176,6 +255,7 @@ class PutAssetForSaleFamily extends Family<AsyncValue<dynamic>> {
       provider.model,
       provider.amount,
       provider.barcode,
+      provider.nftID,
     );
   }
 
@@ -201,12 +281,14 @@ class PutAssetForSaleProvider extends AutoDisposeFutureProvider<dynamic> {
     this.model,
     this.amount,
     this.barcode,
+    this.nftID,
   ) : super.internal(
           (ref) => putAssetForSale(
             ref,
             model,
             amount,
             barcode,
+            nftID,
           ),
           from: putAssetForSaleProvider,
           name: r'putAssetForSaleProvider',
@@ -222,13 +304,15 @@ class PutAssetForSaleProvider extends AutoDisposeFutureProvider<dynamic> {
   final UserModel model;
   final int amount;
   final String barcode;
+  final String nftID;
 
   @override
   bool operator ==(Object other) {
     return other is PutAssetForSaleProvider &&
         other.model == model &&
         other.amount == amount &&
-        other.barcode == barcode;
+        other.barcode == barcode &&
+        other.nftID == nftID;
   }
 
   @override
@@ -237,12 +321,125 @@ class PutAssetForSaleProvider extends AutoDisposeFutureProvider<dynamic> {
     hash = _SystemHash.combine(hash, model.hashCode);
     hash = _SystemHash.combine(hash, amount.hashCode);
     hash = _SystemHash.combine(hash, barcode.hashCode);
+    hash = _SystemHash.combine(hash, nftID.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
-String _$marketPlaceHash() => r'e581f187e0be0f8f954b95851a96dc46dad61069';
+String _$confirmNFTPurchaseHash() =>
+    r'b0cc15637e78da572286a4d3038a247f90f54b0e';
+typedef ConfirmNFTPurchaseRef = AutoDisposeFutureProviderRef<dynamic>;
+
+/// See also [confirmNFTPurchase].
+@ProviderFor(confirmNFTPurchase)
+const confirmNFTPurchaseProvider = ConfirmNFTPurchaseFamily();
+
+/// See also [confirmNFTPurchase].
+class ConfirmNFTPurchaseFamily extends Family<AsyncValue<dynamic>> {
+  /// See also [confirmNFTPurchase].
+  const ConfirmNFTPurchaseFamily();
+
+  /// See also [confirmNFTPurchase].
+  ConfirmNFTPurchaseProvider call(
+    ({
+      String itemBarcode,
+      ItemOwnershipHistory itemHistory,
+      String nftID,
+      double price,
+      List<String> productComments,
+      String productID,
+      List<String> productImages,
+      String productName,
+      String sellerImage
+    }) item,
+    UserModel user,
+  ) {
+    return ConfirmNFTPurchaseProvider(
+      item,
+      user,
+    );
+  }
+
+  @override
+  ConfirmNFTPurchaseProvider getProviderOverride(
+    covariant ConfirmNFTPurchaseProvider provider,
+  ) {
+    return call(
+      provider.item,
+      provider.user,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'confirmNFTPurchaseProvider';
+}
+
+/// See also [confirmNFTPurchase].
+class ConfirmNFTPurchaseProvider extends AutoDisposeFutureProvider<dynamic> {
+  /// See also [confirmNFTPurchase].
+  ConfirmNFTPurchaseProvider(
+    this.item,
+    this.user,
+  ) : super.internal(
+          (ref) => confirmNFTPurchase(
+            ref,
+            item,
+            user,
+          ),
+          from: confirmNFTPurchaseProvider,
+          name: r'confirmNFTPurchaseProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$confirmNFTPurchaseHash,
+          dependencies: ConfirmNFTPurchaseFamily._dependencies,
+          allTransitiveDependencies:
+              ConfirmNFTPurchaseFamily._allTransitiveDependencies,
+        );
+
+  final ({
+    String itemBarcode,
+    ItemOwnershipHistory itemHistory,
+    String nftID,
+    double price,
+    List<String> productComments,
+    String productID,
+    List<String> productImages,
+    String productName,
+    String sellerImage
+  }) item;
+  final UserModel user;
+
+  @override
+  bool operator ==(Object other) {
+    return other is ConfirmNFTPurchaseProvider &&
+        other.item == item &&
+        other.user == user;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, item.hashCode);
+    hash = _SystemHash.combine(hash, user.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+String _$marketPlaceHash() => r'd990869ee869c9527923a2b0dd264d954c9d132d';
 
 /// See also [MarketPlace].
 @ProviderFor(MarketPlace)
@@ -252,6 +449,7 @@ final marketPlaceProvider = AutoDisposeAsyncNotifierProvider<
         ({
           String itemBarcode,
           ItemOwnershipHistory itemHistory,
+          String nftID,
           double price,
           List<String> productComments,
           String productID,
@@ -272,6 +470,7 @@ typedef _$MarketPlace = AutoDisposeAsyncNotifier<
         ({
           String itemBarcode,
           ItemOwnershipHistory itemHistory,
+          String nftID,
           double price,
           List<String> productComments,
           String productID,

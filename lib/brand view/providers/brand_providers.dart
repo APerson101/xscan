@@ -4,11 +4,13 @@ import 'package:xscan/brand%20view/helpers/db.dart';
 import 'package:xscan/brand%20view/models/brand_manufacturer.dart';
 import 'package:xscan/worker/models/scanmodel.dart';
 
+import '../../manufacturer/models/quotation.dart';
 import '../models/brand.dart';
 import '../models/escrow.dart';
 import '../models/manufacturer_summart.dart';
 import '../models/transfer.dart';
 import '../models/verification.dart';
+import '../screens/brand_home_view.dart';
 
 part 'brand_providers.g.dart';
 
@@ -17,12 +19,17 @@ final getManuSummaryProvider =
   var db = GetIt.I<DataBase>();
   return await db.getManuSummary(brand.id, brand.name);
 });
-
-final getBrandInfoProvider =
-    FutureProvider.family<Brand, String>((ref, brandID) async {
+@riverpod
+FutureOr<(Brand, List<QuotationModel>)> getBrandInfoProvider(
+    GetBrandInfoProviderRef ref, String brandID) async {
   var db = GetIt.I<DataBase>();
-  return await db.getBrandFromId(brandID: brandID);
-});
+  var brand = await db.getBrandFromId(brandID: brandID);
+  List<QuotationModel> notifications =
+      (await db.loadBrandNotifications(id: brandID));
+  ref.watch(notLength.notifier).state = notifications.length;
+
+  return (brand, notifications);
+}
 
 final getallManufacturersProvider = FutureProvider((ref) async {
   var db = GetIt.I<DataBase>();

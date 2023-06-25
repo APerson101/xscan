@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../models/sales_model.dart';
 import '../providers/sales_providers.dart';
@@ -24,13 +25,36 @@ class ConfirmSaleView extends ConsumerWidget {
           loading: () {});
     });
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Code retreived is: $barcode"),
+      ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(barcode),
           TextFormField(
             controller: receiverController,
             decoration: InputDecoration(
+                suffix: IconButton(
+                    onPressed: () async {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return Scaffold(
+                            appBar: AppBar(title: const Text('Scanner')),
+                            body: MobileScanner(onDetect: (capture) {
+                              final List<Barcode> barcodes = capture.barcodes;
+                              for (final barcode in barcodes) {
+                                debugPrint(
+                                    'Barcode found! ${barcode.rawValue}');
+                                barcode.rawValue != null
+                                    ? receiverController.text =
+                                        barcode.rawValue!
+                                    : "nothing received";
+                              }
+                            }));
+                      }));
+                    },
+                    icon: const Icon(Icons.qr_code_2)),
                 hintText: 'enter receiver',
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30))),
@@ -53,7 +77,7 @@ class ConfirmSaleView extends ConsumerWidget {
                         ref.watch(confirmSaleProvider.notifier).tryConfirmSale(
                             staff,
                             barcode,
-                            '0.0.14962704',
+                            receiverController.text,
                             data,
                             double.parse(costController.text));
                       },

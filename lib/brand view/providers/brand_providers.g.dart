@@ -6,6 +6,114 @@ part of 'brand_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$getBrandInfoProviderHash() =>
+    r'b0e20378a391f924f7ac0aacc22820f448b44241';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+typedef GetBrandInfoProviderRef
+    = AutoDisposeFutureProviderRef<(Brand, List<QuotationModel>)>;
+
+/// See also [getBrandInfoProvider].
+@ProviderFor(getBrandInfoProvider)
+const getBrandInfoProviderProvider = GetBrandInfoProviderFamily();
+
+/// See also [getBrandInfoProvider].
+class GetBrandInfoProviderFamily
+    extends Family<AsyncValue<(Brand, List<QuotationModel>)>> {
+  /// See also [getBrandInfoProvider].
+  const GetBrandInfoProviderFamily();
+
+  /// See also [getBrandInfoProvider].
+  GetBrandInfoProviderProvider call(
+    String brandID,
+  ) {
+    return GetBrandInfoProviderProvider(
+      brandID,
+    );
+  }
+
+  @override
+  GetBrandInfoProviderProvider getProviderOverride(
+    covariant GetBrandInfoProviderProvider provider,
+  ) {
+    return call(
+      provider.brandID,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'getBrandInfoProviderProvider';
+}
+
+/// See also [getBrandInfoProvider].
+class GetBrandInfoProviderProvider
+    extends AutoDisposeFutureProvider<(Brand, List<QuotationModel>)> {
+  /// See also [getBrandInfoProvider].
+  GetBrandInfoProviderProvider(
+    this.brandID,
+  ) : super.internal(
+          (ref) => getBrandInfoProvider(
+            ref,
+            brandID,
+          ),
+          from: getBrandInfoProviderProvider,
+          name: r'getBrandInfoProviderProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$getBrandInfoProviderHash,
+          dependencies: GetBrandInfoProviderFamily._dependencies,
+          allTransitiveDependencies:
+              GetBrandInfoProviderFamily._allTransitiveDependencies,
+        );
+
+  final String brandID;
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetBrandInfoProviderProvider && other.brandID == brandID;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, brandID.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
 String _$removeProductStateHash() =>
     r'8ef82266659242330f56efc2307b8b57f3e2b9e9';
 

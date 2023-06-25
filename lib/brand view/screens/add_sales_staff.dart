@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
@@ -20,53 +22,78 @@ class AddSalesStaff extends ConsumerWidget {
   final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(_creationState, (previous, next) {
+      if (previous != next && next != null) {
+        if (next) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Successfully added employee")));
+          Navigator.of(context).pop();
+        }
+      }
+    });
     return Scaffold(
+      persistentFooterButtons: [
+        ElevatedButton(
+          onPressed: () async {
+            ref.watch(createStaffProvider(SalesModel(
+                email: emailController.text,
+                password: passwordController.text,
+                name: nameController.text,
+                id: const Uuid().v4(),
+                image: ref.watch(_employeeImage)!.path,
+                brandID: brand.id,
+                accountID: '',
+                brandName: brand.name,
+                privateKey: '')));
+            Navigator.of(context).pop();
+          },
+          style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 65)),
+          child: const Text("Create employee"),
+        )
+      ],
       appBar: AppBar(),
       body: Form(
           key: formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                      hintText: 'Enter staff name',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-              TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                      hintText: 'Enter staff email',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-              TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                      hintText: 'Enter staff password',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-              ElevatedButton(
-                  onPressed: () async {
-                    ref.watch(_employeeImage.notifier).state =
-                        await ImagePicker()
-                            .pickImage(source: ImageSource.gallery);
-                  },
-                  child: const Text("Select employee profile pic")),
-              ElevatedButton(
-                  onPressed: () async {
-                    ref.watch(createStaffProvider(SalesModel(
-                        email: emailController.text,
-                        password: passwordController.text,
-                        name: nameController.text,
-                        id: const Uuid().v4(),
-                        image: ref.watch(_employeeImage)!.path,
-                        brandID: brand.id,
-                        accountID: '',
-                        brandName: brand.name,
-                        privateKey: '')));
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Create employee"))
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                        hintText: 'Enter staff name',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)))),
+                TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                        hintText: 'Enter staff email',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)))),
+                TextFormField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        hintText: 'Enter staff password',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)))),
+                ref.watch(_employeeImage) == null
+                    ? ElevatedButton(
+                        onPressed: () async {
+                          ref.watch(_employeeImage.notifier).state =
+                              await ImagePicker()
+                                  .pickImage(source: ImageSource.gallery);
+                        },
+                        child: const Text("Select employee profile pic"))
+                    : CircleAvatar(
+                        radius: 100,
+                        backgroundImage: FileImage(
+                          File(ref.watch(_employeeImage)!.path),
+                        )),
+              ],
+            ),
           )),
     );
   }
@@ -76,6 +103,8 @@ class AddSalesStaff extends ConsumerWidget {
 FutureOr createStaff(CreateStaffRef ref, SalesModel sales) async {
   var db = GetIt.I<DataBase>();
   await db.createSales(sales.id, sales);
+  ref.watch(_creationState.notifier).state = true;
 }
 
 final _employeeImage = StateProvider<XFile?>((ref) => null);
+final _creationState = StateProvider<bool?>((ref) => null);

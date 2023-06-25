@@ -6,7 +6,7 @@ part of 'add_sales_staff.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$createStaffHash() => r'77f405a5d8640cdfe5a409fd60cc92ce5d7bff4a';
+String _$createStaffHash() => r'2e4e878068db4b74fcd1338f81ca7e8d96b54b68';
 
 /// Copied from Dart SDK
 class _SystemHash {

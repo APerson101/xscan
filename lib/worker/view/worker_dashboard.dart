@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'package:xscan/manufacturer/models/employee.dart';
 import 'package:xscan/worker/providers/employee_provider.dart';
 import 'package:xscan/worker/view/scanned_barcode_view.dart';
@@ -14,9 +13,14 @@ class WorkerDashboardView extends ConsumerWidget {
   final Employee employee;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SingleChildScrollView(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
-        children: [_CameraView(employee), _CompletedScans(employee.id)],
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _CompletedScans(employee.id),
+          _CameraView(employee),
+        ],
       ),
     );
   }
@@ -29,27 +33,30 @@ class _CameraView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: ElevatedButton(
-          onPressed: () async {
-            String barcodeScanRes;
-            try {
-              barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-                  '#ff6666', 'Cancel', false, ScanMode.BARCODE);
-              barcodeScanRes = const Uuid().v4().toString();
-              if (context.mounted) {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return ScannedBarcodeView(
-                    barcode: barcodeScanRes,
-                    employee: employee,
-                  );
-                }));
-              }
-              debugPrint(barcodeScanRes);
-            } on PlatformException {
-              barcodeScanRes = 'Failed to get platform version.';
+        onPressed: () async {
+          String barcodeScanRes;
+          try {
+            barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                '#ff6666', 'Cancel', false, ScanMode.QR);
+            // barcodeScanRes = const Uuid().v4().toString();
+            debugPrint('Scanned code is: $barcodeScanRes');
+            if (context.mounted) {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return ScannedBarcodeView(
+                  barcode: barcodeScanRes,
+                  employee: employee,
+                );
+              }));
             }
-          },
-          child: const Text("Scan barcode")),
+            debugPrint(barcodeScanRes);
+          } on PlatformException {
+            barcodeScanRes = 'Failed to get platform version.';
+          }
+        },
+        style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 65)),
+        child: const Text("Scan Code"),
+      ),
     );
   }
 }

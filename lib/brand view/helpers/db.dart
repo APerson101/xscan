@@ -311,14 +311,19 @@ class DataBase {
     String brandSymbol,
     String receiver,
   ) async {
-    // (await store.collection('users'))
+    var pk = (await store
+            .collection('appusers')
+            .where('accountID', isEqualTo: receiver)
+            .limit(1)
+            .get())
+        .docs[0]
+        .get('privateKey');
     var nftId = (await functions.httpsCallable('createNFTReceipt').call({
       'data': {
         'brandName': brandName,
         'brandSymbol': brandSymbol,
         'receiver': receiver,
-        'receiverPK':
-            '25ad5032f5c484d011b0482eaf3c1af9b44d07b423f19e7440dca6502d4ec999'
+        'receiverPK': pk
       }
     }))
         .data;
@@ -393,7 +398,8 @@ class DataBase {
     await store.doc('employees/${employee.id}').set(employee.toMap());
   }
 
-  getPendingAgreements({required String id}) async {
+  Future<List<BrandManufaturer>> getPendingAgreements(
+      {required String id}) async {
     var docs = (await store
             .collection('partnerships')
             .where('manufacturerID', isEqualTo: id)
@@ -402,8 +408,20 @@ class DataBase {
         .docs;
     List<BrandManufaturer> pendingPartnerships = [];
     for (var doc in docs) {
+      var quotation = (await store
+                  .collection('quotations')
+                  .where('transaction.id', isEqualTo: doc.get('id'))
+                  .limit(1)
+                  .get())
+              .size >
+          0;
+
+      if (quotation) {
+        continue;
+      }
       pendingPartnerships.add(BrandManufaturer.fromMap(doc.data()));
     }
+// filter all those quotations that have been sent
     return pendingPartnerships;
   }
 
@@ -612,7 +630,7 @@ class DataBase {
           amountPaid: ownerFirst.cost.toString(),
           purchased: ownerFirst.time)
     ];
-    var brandId = '';
+    var brandId = ownerFirst.brandID;
     for (var resoldItem in resoldDocs) {
       // convert to object
       var txn = Transfer.fromMap(resoldItem.data());
@@ -901,10 +919,14 @@ class DataBase {
   addItemforSale(
       {required String barcode,
       required int price,
+      required String nftID,
       required String seller}) async {
-    (await store
-        .collection("market")
-        .add({'barcode': barcode, 'price': price, 'seller': seller}));
+    (await store.collection("market").add({
+      'barcode': barcode,
+      'price': price,
+      'seller': seller,
+      'nftID': nftID
+    }));
   }
 
   confirmReSale(
@@ -928,10 +950,12 @@ class DataBase {
     List<String> allBarcodes = [];
     List<int> prices = [];
     List<String> sellers = [];
+    List<String> nftIDs = [];
     for (var doc in allBarcodesForSaleDocs) {
       sellers.add(doc.get('seller'));
       allBarcodes.add(doc.get('barcode'));
       prices.add(int.parse(doc.get('price').toString()));
+      nftIDs.add(doc.get('nftID'));
     }
 
     List<ItemForSale> forSale = [];
@@ -945,13 +969,23 @@ class DataBase {
       productID = scanned.productID!;
       productName = scanned.productName!;
       ownership = await getOwnership(code);
+      var brand = Brand.fromMap((await store
+              .collection('brands')
+              .where('id', isEqualTo: ownership.brandID)
+              .limit(1)
+              .get())
+          .docs[0]
+          .data());
+      var product =
+          brand.catalog.firstWhere((element) => element.id == productID);
       forSale.add((
-        productImages: [],
+        productImages: product.imageLink,
         productID: productID,
         productName: productName,
         productComments: [],
         price: prices[allBarcodes.indexOf(code)].toDouble(),
         sellerImage: '',
+        nftID: nftIDs[allBarcodes.indexOf(code)],
         itemHistory: ownership,
         itemBarcode: code
       ));
@@ -968,6 +1002,61 @@ class DataBase {
         .docs[0]
         .data());
   }
-}
-  // maybe: Retrieve NFT
 
+  sendHbar(String receiverID, String senderAccountID, String senderPK,
+      int amount) async {
+    var res = await functions.httpsCallable('transferHbar').call({
+      'receiverID': receiverID,
+      'senderID': senderAccountID,
+      'senderPK': senderPK,
+      'amount': amount
+    });
+    debugPrint(res.data.toString());
+  }
+
+  removeQuotation({required String id}) async {
+    var idRmv = (await store
+            .collection('quotations')
+            .where('id', isEqualTo: id)
+            .limit(1)
+            .get())
+        .docs[0]
+        .id;
+
+    (await store.doc('quotations/$idRmv').delete());
+  }
+
+  purchaseItem(
+      {required ItemForSale item,
+      required String sender,
+      required String senderPK}) async {
+    int price = item.price.toInt();
+    String barcode = item.itemBarcode;
+    String receiver =
+        item.itemHistory.owners[item.itemHistory.owners.length - 1].accountID;
+    await sendHbar(receiver, sender, senderPK, price);
+    await transferNFTOwnership(item.nftID, sender, receiver, senderPK);
+    //remove from market
+    var idRemoval = (await store
+            .collection('market')
+            .where('barcode', isEqualTo: barcode)
+            .limit(1)
+            .get())
+        .docs[0]
+        .id;
+    await store.doc('market/$idRemoval').delete();
+    // record transfer into database
+    await confirmReSale(
+      barcode: barcode,
+      transaction: Transfer(
+          senderAddress: sender,
+          receiverAddress: receiver,
+          receiptID: item.nftID,
+          brandID: item.itemHistory.brandID,
+          productID: item.productID,
+          barcodeID: barcode,
+          time: DateTime.now(),
+          cost: double.parse(price.toString())),
+    );
+  }
+}

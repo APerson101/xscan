@@ -9,14 +9,20 @@ import '../../brand view/models/brand.dart';
 import '../../brand view/models/manufacturer.dart';
 import '../models/employee.dart';
 import '../models/file.dart';
+import '../screens/main_screen_manufacturer.dart';
 
 part 'manu_providers.g.dart';
 
-final loadManuInfoProvider =
-    FutureProvider.family<Manufacturer, String>((ref, id) async {
+@riverpod
+FutureOr<(Manufacturer, List<BrandManufaturer>)> loadManuInfo(
+    LoadManuInfoRef ref, String id) async {
   var db = GetIt.I<DataBase>();
-  return await db.loadManuInfo(id);
-});
+  var manu = await db.loadManuInfo(id);
+  var notifications = await db.getPendingAgreements(id: manu.id);
+  ref.watch(notificationsNumber.notifier).state = notifications.length;
+
+  return (manu, notifications);
+}
 
 final getEmployees =
     FutureProvider.family<List<Employee>, String>((ref, id) async {
@@ -47,10 +53,11 @@ final getProduct = FutureProvider.family<Product?, String>((ref, id) async {
   var db = GetIt.I<DataBase>();
   return await db.getProductFromId(productID: id);
 });
-final getBrand = FutureProvider.family<Brand, String>((ref, id) async {
+@riverpod
+FutureOr<Brand> getBrand(GetBrandRef ref, String id) async {
   var db = GetIt.I<DataBase>();
   return await db.getBrandFromId(brandID: id);
-});
+}
 
 final deleteStaff = FutureProvider.family<void, String>((ref, id) async {
   var db = GetIt.I<DataBase>();

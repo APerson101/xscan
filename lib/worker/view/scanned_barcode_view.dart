@@ -28,40 +28,66 @@ class ScannedBarcodeView extends ConsumerWidget {
           loading: () {});
     });
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Text("scanned code is: $barcode"),
-          ref.watch(getAllEmployeeProducts(employee.businessID)).when(
-              data: (data) {
-                return DropdownButtonFormField<Agreement>(
-                    value: ref.watch(_selectedProduct) ?? data[0],
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      hintText: "Select product",
-                    ),
-                    items: data
-                        .map((e) => DropdownMenuItem<Agreement>(
-                              value: e,
-                              child: SizedBox(
-                                  height: 74,
-                                  width: 150,
-                                  child: ListTile(
-                                    title: Text(e.product.name),
-                                    subtitle: Text("ID: ${e.agreementID}"),
-                                  )),
-                            ))
-                        .toList(),
-                    onChanged: (newt) {
-                      if (newt != null) {
-                        ref.watch(_selectedProduct.notifier).state = newt;
-                      }
-                    });
-              },
-              error: (er, st) => const Text("error"),
-              loading: () => const CircularProgressIndicator.adaptive()),
-          ElevatedButton(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("scanned code is: $barcode"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ref.watch(getAllEmployeeProducts(employee.businessID)).when(
+                data: (data) {
+                  return DropdownButtonFormField<Agreement>(
+                      value: ref.watch(_selectedProduct) ?? data[0],
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        hintText: "Select product",
+                      ),
+                      items: data
+                          .map((e) => DropdownMenuItem<Agreement>(
+                              value: e, child: Text(e.product.name)))
+                          .toList(),
+                      onChanged: (newt) {
+                        if (newt != null) {
+                          ref.watch(_selectedProduct.notifier).state = newt;
+                        }
+                      });
+                },
+                error: (er, st) => const Text("error"),
+                loading: () => const CircularProgressIndicator.adaptive()),
+            ref.watch(_selectedProduct) == null
+                ? Container()
+                : Card(
+                    child: ListTile(
+                    title: Text(
+                        "Brand Name: ${ref.watch(_selectedProduct)!.product.brandOwner}"),
+                    subtitle: Text(
+                        "Product Name: ${ref.watch(_selectedProduct)!.product.name}"),
+                  )),
+            ref.watch(_selectedProduct) == null
+                ? Container()
+                : SizedBox(
+                    height: 200,
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            ...ref
+                                .watch(_selectedProduct)!
+                                .product
+                                .imageLink
+                                .map((e) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.network(e),
+                                    ))
+                                .toList()
+                          ],
+                        )),
+                  ),
+            ElevatedButton(
               onPressed: () async {
                 // save barcode
                 var scanned = ScanModel()
@@ -77,8 +103,12 @@ class ScannedBarcodeView extends ConsumerWidget {
                     .watch(employeeApproveCodeProvider.notifier)
                     .employeeScanItem(barcode, scanned);
               },
-              child: const Text("Continue"))
-        ],
+              style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 65)),
+              child: const Text("Continue"),
+            )
+          ],
+        ),
       ),
     );
   }
