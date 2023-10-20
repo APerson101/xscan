@@ -1,4 +1,4 @@
-package com.example.xscan
+package com.hadi.xscan
 
 import io.flutter.embedding.android.FlutterActivity
 
