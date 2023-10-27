@@ -6,7 +6,7 @@ part of 'notifications_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getNotificationsHash() => r'd74bbdb197a061d7f58a669b2ffb4dd1dc1b16a4';
+String _$getNotificationsHash() => r'f7bc1cc723747c0766258a25874d68dcb846aeef';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,14 +30,15 @@ class _SystemHash {
 }
 
 typedef GetNotificationsRef
-    = AutoDisposeFutureProviderRef<List<QuotationModel>>;
+    = AutoDisposeFutureProviderRef<(List<QuotationModel>, List<Escrow?>)>;
 
 /// See also [getNotifications].
 @ProviderFor(getNotifications)
 const getNotificationsProvider = GetNotificationsFamily();
 
 /// See also [getNotifications].
-class GetNotificationsFamily extends Family<AsyncValue<List<QuotationModel>>> {
+class GetNotificationsFamily
+    extends Family<AsyncValue<(List<QuotationModel>, List<Escrow?>)>> {
   /// See also [getNotifications].
   const GetNotificationsFamily();
 
@@ -76,7 +77,7 @@ class GetNotificationsFamily extends Family<AsyncValue<List<QuotationModel>>> {
 
 /// See also [getNotifications].
 class GetNotificationsProvider
-    extends AutoDisposeFutureProvider<List<QuotationModel>> {
+    extends AutoDisposeFutureProvider<(List<QuotationModel>, List<Escrow?>)> {
   /// See also [getNotifications].
   GetNotificationsProvider(
     this.brandID,
@@ -112,15 +113,15 @@ class GetNotificationsProvider
   }
 }
 
-String _$acceptQuotationHash() => r'9bc4930c2bed694aca518cca2221697eba774a9e';
-typedef AcceptQuotationRef = AutoDisposeProviderRef<dynamic>;
+String _$acceptQuotationHash() => r'b810c281ebf0695fb3d96439a1814cb3a859f98d';
+typedef AcceptQuotationRef = AutoDisposeFutureProviderRef<dynamic>;
 
 /// See also [acceptQuotation].
 @ProviderFor(acceptQuotation)
 const acceptQuotationProvider = AcceptQuotationFamily();
 
 /// See also [acceptQuotation].
-class AcceptQuotationFamily extends Family<dynamic> {
+class AcceptQuotationFamily extends Family<AsyncValue<dynamic>> {
   /// See also [acceptQuotation].
   const AcceptQuotationFamily();
 
@@ -164,7 +165,7 @@ class AcceptQuotationFamily extends Family<dynamic> {
 }
 
 /// See also [acceptQuotation].
-class AcceptQuotationProvider extends AutoDisposeProvider<dynamic> {
+class AcceptQuotationProvider extends AutoDisposeFutureProvider<dynamic> {
   /// See also [acceptQuotation].
   AcceptQuotationProvider(
     this.quotation,

@@ -5,8 +5,10 @@ import 'package:xscan/brand%20view/models/brand_manufacturer.dart';
 import 'package:xscan/brand%20view/models/product.dart';
 import 'package:xscan/worker/models/scanmodel.dart';
 
+import '../../all/providers/momo_providers.dart';
 import '../../brand view/models/brand.dart';
 import '../../brand view/models/manufacturer.dart';
+import '../../models/Escrow.dart';
 import '../models/employee.dart';
 import '../models/file.dart';
 import '../screens/main_screen_manufacturer.dart';
@@ -14,14 +16,16 @@ import '../screens/main_screen_manufacturer.dart';
 part 'manu_providers.g.dart';
 
 @riverpod
-FutureOr<(Manufacturer, List<BrandManufaturer>)> loadManuInfo(
+FutureOr<(Manufacturer, List<BrandManufaturer>, List<Escrow?>)> loadManuInfo(
     LoadManuInfoRef ref, String id) async {
   var db = GetIt.I<DataBase>();
   var manu = await db.loadManuInfo(id);
   var notifications = await db.getPendingAgreements(id: manu.id);
   ref.watch(notificationsNumber.notifier).state = notifications.length;
 
-  return (manu, notifications);
+  var escrows = await ref.watch(getEscrowStatusForIDProvider(id).future);
+
+  return (manu, notifications, escrows);
 }
 
 final getEmployees =

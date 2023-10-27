@@ -6,7 +6,8 @@ part of 'all_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getHbarBalanceHash() => r'd2fc12315fe8970ad3362dd9836068accca457b1';
+String _$sendHbarToReceiverHash() =>
+    r'e679cc5a09a8a0e35b4ad6a758c8ea8455498822';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,92 +30,6 @@ class _SystemHash {
   }
 }
 
-typedef GetHbarBalanceRef = AutoDisposeFutureProviderRef<
-    ({int hbar, List<({int balance, String tokenId})> tokens})>;
-
-/// See also [getHbarBalance].
-@ProviderFor(getHbarBalance)
-const getHbarBalanceProvider = GetHbarBalanceFamily();
-
-/// See also [getHbarBalance].
-class GetHbarBalanceFamily extends Family<
-    AsyncValue<({int hbar, List<({int balance, String tokenId})> tokens})>> {
-  /// See also [getHbarBalance].
-  const GetHbarBalanceFamily();
-
-  /// See also [getHbarBalance].
-  GetHbarBalanceProvider call(
-    String accountID,
-  ) {
-    return GetHbarBalanceProvider(
-      accountID,
-    );
-  }
-
-  @override
-  GetHbarBalanceProvider getProviderOverride(
-    covariant GetHbarBalanceProvider provider,
-  ) {
-    return call(
-      provider.accountID,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'getHbarBalanceProvider';
-}
-
-/// See also [getHbarBalance].
-class GetHbarBalanceProvider extends AutoDisposeFutureProvider<
-    ({int hbar, List<({int balance, String tokenId})> tokens})> {
-  /// See also [getHbarBalance].
-  GetHbarBalanceProvider(
-    this.accountID,
-  ) : super.internal(
-          (ref) => getHbarBalance(
-            ref,
-            accountID,
-          ),
-          from: getHbarBalanceProvider,
-          name: r'getHbarBalanceProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$getHbarBalanceHash,
-          dependencies: GetHbarBalanceFamily._dependencies,
-          allTransitiveDependencies:
-              GetHbarBalanceFamily._allTransitiveDependencies,
-        );
-
-  final String accountID;
-
-  @override
-  bool operator ==(Object other) {
-    return other is GetHbarBalanceProvider && other.accountID == accountID;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, accountID.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-String _$sendHbarToReceiverHash() =>
-    r'e679cc5a09a8a0e35b4ad6a758c8ea8455498822';
 typedef SendHbarToReceiverRef = AutoDisposeFutureProviderRef<dynamic>;
 
 /// See also [sendHbarToReceiver].
@@ -220,4 +135,19 @@ class SendHbarToReceiverProvider extends AutoDisposeFutureProvider<dynamic> {
     return _SystemHash.finish(hash);
   }
 }
+
+String _$configHash() => r'4d2b6972abb11e54a6e47bffccbdef98e90d00d8';
+
+/// See also [config].
+@ProviderFor(config)
+final configProvider = AutoDisposeFutureProvider<void>.internal(
+  config,
+  name: r'configProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$configHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef ConfigRef = AutoDisposeFutureProviderRef<void>;
 // ignore_for_file: unnecessary_raw_strings, subtype_of_sealed_class, invalid_use_of_internal_member, do_not_use_environment, prefer_const_constructors, public_member_api_docs, avoid_private_typedef_functions

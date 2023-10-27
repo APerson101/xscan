@@ -54,13 +54,14 @@ class CreateEmployeePage extends ConsumerWidget {
                   child: const Text("Select employee profile pic")),
               ElevatedButton(
                   onPressed: () async {
-                    ref.watch(createEmployeeProvider(Employee(
-                        email: emailController.text,
-                        password: passwordController.text,
-                        name: nameController.text,
-                        id: const Uuid().v4(),
-                        image: ref.watch(_employeeImage)!.path,
-                        businessID: manufacturer.id)));
+                    await ref.watch(createEmployeeProvider(Employee(
+                            email: emailController.text,
+                            password: passwordController.text,
+                            name: nameController.text,
+                            id: const Uuid().v4(),
+                            image: ref.watch(_employeeImage)!.path,
+                            businessID: manufacturer.id))
+                        .future);
                     Navigator.of(context).pop();
                     ref.invalidate(getEmployees(manufacturer.id));
                   },

@@ -25,7 +25,7 @@ class SendHbarView extends ConsumerWidget {
               if (formkey.currentState!.validate()) {
                 ref.watch(sendHbarToReceiverProvider(receiverController.text,
                     accountID, pk, int.parse(amountController.text)));
-                ref.invalidate(GetHbarBalanceProvider(accountID));
+                // ref.invalidate(GetHbarBalanceProvider(accountID));
                 Navigator.of(context).pop();
               }
             },

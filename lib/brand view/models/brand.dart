@@ -11,6 +11,7 @@ class Brand {
   String address;
   String email;
   DateTime created;
+  int balance;
   String privateKey;
   String accountID;
   String logoImage;
@@ -23,6 +24,7 @@ class Brand {
     required this.address,
     required this.email,
     required this.created,
+    required this.balance,
     required this.privateKey,
     required this.accountID,
     required this.logoImage,
@@ -37,6 +39,7 @@ class Brand {
     String? address,
     String? email,
     DateTime? created,
+    int? balance,
     String? privateKey,
     String? accountID,
     String? logoImage,
@@ -50,6 +53,7 @@ class Brand {
       address: address ?? this.address,
       email: email ?? this.email,
       created: created ?? this.created,
+      balance: balance ?? this.balance,
       privateKey: privateKey ?? this.privateKey,
       accountID: accountID ?? this.accountID,
       logoImage: logoImage ?? this.logoImage,
@@ -66,6 +70,7 @@ class Brand {
       'address': address,
       'email': email,
       'created': created.millisecondsSinceEpoch,
+      'balance': balance,
       'privateKey': privateKey,
       'accountID': accountID,
       'logoImage': logoImage,
@@ -82,6 +87,7 @@ class Brand {
       address: map['address'] ?? '',
       email: map['email'] ?? '',
       created: DateTime.fromMillisecondsSinceEpoch(map['created']),
+      balance: map['balance']?.toInt() ?? 0,
       privateKey: map['privateKey'] ?? '',
       accountID: map['accountID'] ?? '',
       logoImage: map['logoImage'] ?? '',
@@ -96,7 +102,7 @@ class Brand {
 
   @override
   String toString() {
-    return 'Brand(name: $name, id: $id, location: $location, phone: $phone, address: $address, email: $email, created: $created, privateKey: $privateKey, accountID: $accountID, logoImage: $logoImage, catalog: $catalog)';
+    return 'Brand(name: $name, id: $id, location: $location, phone: $phone, address: $address, email: $email, created: $created, balance: $balance, privateKey: $privateKey, accountID: $accountID, logoImage: $logoImage, catalog: $catalog)';
   }
 
   @override
@@ -111,6 +117,7 @@ class Brand {
         other.address == address &&
         other.email == email &&
         other.created == created &&
+        other.balance == balance &&
         other.privateKey == privateKey &&
         other.accountID == accountID &&
         other.logoImage == logoImage &&
@@ -126,6 +133,7 @@ class Brand {
         address.hashCode ^
         email.hashCode ^
         created.hashCode ^
+        balance.hashCode ^
         privateKey.hashCode ^
         accountID.hashCode ^
         logoImage.hashCode ^

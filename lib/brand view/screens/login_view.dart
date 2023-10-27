@@ -189,6 +189,7 @@ class SignUpPage extends ConsumerWidget {
   final addressController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final phoneController = TextEditingController();
   final BuildContext ctx;
   final FToast toast = FToast();
   @override
@@ -368,6 +369,19 @@ class SignUpPage extends ConsumerWidget {
                   padding: EdgeInsets.all(padding),
                   child: ref.watch(_selectedUserTypes) != UserTypes.user
                       ? TextFormField(
+                          controller: phoneController,
+                          decoration: InputDecoration(
+                              suffixIcon: const Icon(Icons.location_on_sharp),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              labelText: "Enter business phone number"),
+                        )
+                      : const Gap(0),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: ref.watch(_selectedUserTypes) != UserTypes.user
+                      ? TextFormField(
                           controller: phoneNumberController,
                           decoration: InputDecoration(
                               suffixIcon: const Icon(Icons.phone),
@@ -434,7 +448,8 @@ class SignUpPage extends ConsumerWidget {
                               email: emailController.text,
                               logoImage: ref.watch(_businessLogo)!.path,
                               accountID: 'accountID',
-                              catalog: []),
+                              catalog: [],
+                              balance: 0),
                           UserTypes.manufacturer => Manufacturer(
                               name: nameController.text,
                               location: locationController.text,
@@ -443,6 +458,7 @@ class SignUpPage extends ConsumerWidget {
                               id: const Uuid().v4(),
                               privateKey: 'privateKey',
                               email: emailController.text,
+                              phone: phoneController.text,
                               accountID: 'accountID',
                               productions: []),
                           UserTypes.user => UserModel(

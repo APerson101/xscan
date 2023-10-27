@@ -24,7 +24,6 @@ import '../../manufacturer/models/quotation.dart';
 import '../../sales/models/transfermode.dart';
 import '../../user/providers/market_place_provider.dart';
 import '../../worker/models/scanmodel.dart';
-import '../models/escrow.dart';
 import '../models/manufacturer_summart.dart';
 import '../models/usermodel.dart';
 
@@ -32,12 +31,12 @@ class DataBase {
   var get = GetIt.I;
   FirebaseFirestore store;
   FirebaseAuth auth;
-  FirebaseFunctions functions;
+  FirebaseFunctions? functions;
   FirebaseStorage storage;
   DataBase(
       {required this.store,
       required this.auth,
-      required this.functions,
+      this.functions,
       required this.storage});
 
   getNumberOfVerifications(String brandID) async {
@@ -86,50 +85,31 @@ class DataBase {
         .firstWhere((element) => describeEnum(element) == userDoc.get('type'));
   }
 
-  String BRAND_ID = '';
-  String MANU_ID_1 = '';
-  String MANU_ID_2 = '';
-  String EMP_1 = '';
-  String EMP_2 = '';
-  String EMP_3 = '';
-  createFakeUser(String email, String password) async {
+  createUser({required String email, required String password}) async {
     var id1 = await auth.createUserWithEmailAndPassword(
         email: email, password: password);
     return id1.user!.uid;
   }
 
-  storeFakeUser(String id, String type) async {
+  storeUser(String id, String type) async {
     await store.collection('users').add({'id': id, 'type': type});
   }
 
-  createUser() async {
+  createFakeUsers() async {
     //brand
-    var id1 = await auth.createUserWithEmailAndPassword(
-        email: '1@1.co', password: '11111111');
-    BRAND_ID = id1.user!.uid;
-    //manufacturer
-    var id2 = await auth.createUserWithEmailAndPassword(
-        email: '2@1.co', password: '11111111');
-    MANU_ID_1 = id2.user!.uid;
+    var id1 = await createUser(email: 'brand@brand.com', password: '11111111');
 
-    //manufacturer
-    var id3 = await auth.createUserWithEmailAndPassword(
-        email: '3@1.co', password: '11111111');
-    MANU_ID_2 = id3.user!.uid;
-    //Employee
-    var id4 = await auth.createUserWithEmailAndPassword(
-        email: 'm1@1.co', password: '11111111');
-    EMP_1 = id4.user!.uid;
-    //Employee
-    var id5 = await auth.createUserWithEmailAndPassword(
-        email: 'm2@1.co', password: '11111111');
-    EMP_2 = id5.user!.uid;
+    //manufacturer 1
+    var id2 = await createUser(email: 'manu@manu.com', password: '11111111');
 
-    //Employee
-    var id6 = await auth.createUserWithEmailAndPassword(
-        email: 'b@1.co', password: '11111111');
-    EMP_3 = id6.user!.uid;
-
+    //manufacturer 2
+    var id3 = await createUser(email: 'manu@manu.com', password: '11111111');
+    //Employee 1
+    var id4 = await createUser(email: 'emp1@manu.com', password: '11111111');
+    //Employee 2
+    var id5 = await createUser(email: 'emp2@manu.com', password: '11111111');
+    //Employee 1 for business
+    var id6 = await createUser(email: 'emp1@brand.com', password: '11111111');
     await store.collection('users').add({'id': id1.user!.uid, 'type': 'brand'});
     await store
         .collection('users')
@@ -146,9 +126,32 @@ class DataBase {
     await store
         .collection('users')
         .add({'id': id6.user!.uid, 'type': 'employee'});
+
+    await createBrand(
+        brand: Brand(
+            name: "name",
+            id: const Uuid().v4(),
+            location: "location",
+            phone: "phone",
+            address: "address",
+            email: "brand@brand.com",
+            created: DateTime.now(),
+            balance: 0,
+            privateKey: "privateKey",
+            accountID: "accountID",
+            logoImage: "logoImage",
+            catalog: [
+          Product(
+              name: "product name",
+              id: const Uuid().v4(),
+              brandOwner: id1,
+              notes: "notes",
+              imageLink: ["test link", "test liink2"],
+              created: DateTime.now())
+        ]));
   }
 
-  createBrand({brand}) async {
+  createBrand({required Brand brand}) async {
     var imageUrl = await storeImage(brand.logoImage, '${brand.id}.png');
     brand.logoImage = imageUrl;
     await store.collection('brands').add(brand.toMap());
@@ -161,11 +164,11 @@ class DataBase {
   }
 
   createEmployees(String id, Employee emp) async {
-    var id = await createFakeUser(emp.email, emp.password);
+    var id = await createUser(email: emp.email, password: emp.password);
     emp.id = id;
     var imageUrl = await storeImage(emp.image, '${emp.id}.png');
     emp.image = imageUrl;
-    await storeFakeUser(id, 'employee');
+    await storeUser(id, 'employee');
     await store.doc('employees/$id').set(emp.toMap());
   }
 
@@ -191,7 +194,7 @@ class DataBase {
           password: '11111111',
           image: "TESTING",
           name: 'Toechukwu Kennedy',
-          id: EMP_1,
+          id: "EMP_1",
           businessID: 'manufacturer 1');
     if (index == -1) {
       //doesnt exist, create and add
@@ -245,19 +248,19 @@ class DataBase {
 
   saveUpdateToFile(String manufacturerPK, String textTobeStored,
       dynamic jsonFormat, String barcode, String brandPK) async {
-    String fileID = (await functions.httpsCallable('storeBarcodeInFile').call({
-      'data': {'pk': brandPK, 'text': '$textTobeStored --- '}
-    }))
-        .data;
+    // String fileID = (await functions.httpsCallable('storeBarcodeInFile').call({
+    //   'data': {'pk': brandPK, 'text': '$textTobeStored --- '}
+    // }))
+    //     .data;
 
-    debugPrint('created file id is: $fileID');
+    // debugPrint('created file id is: $fileID');
 
-    // save things to the database
-    (await store
-        .doc('files/$fileID')
-        .set({'fileID': fileID, 'barcode': barcode}));
-    (await store.collection('files/$fileID/updates').add(jsonFormat));
-    return fileID;
+    // // save things to the database
+    // (await store
+    //     .doc('files/$fileID')
+    //     .set({'fileID': fileID, 'barcode': barcode}));
+    // (await store.collection('files/$fileID/updates').add(jsonFormat));
+    // return fileID;
   }
 
   Future<FileModelHedera> getFileContentDB(String fileID) async {
@@ -268,13 +271,13 @@ class DataBase {
   }
 
   getFileContent(String fileID) async {
-    String content = (await functions.httpsCallable('getFileContent').call({
-      'data': {'fileId': fileID}
-    }))
-        .data;
+    // String content = (await functions.httpsCallable('getFileContent').call({
+    //   'data': {'fileId': fileID}
+    // }))
+    //     .data;
 
-    debugPrint('file content is: $content');
-    return content;
+    // debugPrint('file content is: $content');
+    // return content;
   }
 
   getFileFromBarcode(String barcode) async {
@@ -292,18 +295,18 @@ class DataBase {
     String fileID,
     String textTobeStored,
   ) async {
-    await functions.httpsCallable('appendFile').call({
-      'data': {'fileId': fileID, 'text': '$textTobeStored --- ', 'pk': brandPK}
-    });
-    debugPrint('file appent success');
+    // await functions.httpsCallable('appendFile').call({
+    //   'data': {'fileId': fileID, 'text': '$textTobeStored --- ', 'pk': brandPK}
+    // });
+    // debugPrint('file appent success');
 
-    var id = (await store.collection('files/$fileID/updates').limit(1).get())
-        .docs[0]
-        .id;
+    // var id = (await store.collection('files/$fileID/updates').limit(1).get())
+    //     .docs[0]
+    //     .id;
 
-    (await store
-        .doc('files/$fileID/updates/$id')
-        .update({'brandApproved': 'true'}));
+    // (await store
+    //     .doc('files/$fileID/updates/$id')
+    //     .update({'brandApproved': 'true'}));
   }
 
   createNFTReceipt(
@@ -318,38 +321,39 @@ class DataBase {
             .get())
         .docs[0]
         .get('privateKey');
-    var nftId = (await functions.httpsCallable('createNFTReceipt').call({
-      'data': {
-        'brandName': brandName,
-        'brandSymbol': brandSymbol,
-        'receiver': receiver,
-        'receiverPK': pk
-      }
-    }))
-        .data;
-    debugPrint('nft created id is: $nftId');
-    return nftId;
+    // var nftId = (await functions.httpsCallable('createNFTReceipt').call({
+    //   'data': {
+    //     'brandName': brandName,
+    //     'brandSymbol': brandSymbol,
+    //     'receiver': receiver,
+    //     'receiverPK': pk
+    //   }
+    // }))
+    //     .data;
+    // debugPrint('nft created id is: $nftId');
+    return "nftId";
   }
 
   transferNFTOwnership(String nftId, String sender, String receiver,
       String senderPrivateKey) async {
-    bool data =
-        (await functions.httpsCallable('transferItemNftOwnership').call({
-      'data': {
-        'nftId': nftId,
-        'sender': sender,
-        'receiver': receiver,
-        'senderPrivateKey': senderPrivateKey
-      }
-    }))
-            .data;
-    debugPrint('nft ownership transfer status: $data');
+    // bool data =
+    //     (await functions.httpsCallable('transferItemNftOwnership').call({
+    //   'data': {
+    //     'nftId': nftId,
+    //     'sender': sender,
+    //     'receiver': receiver,
+    //     'senderPrivateKey': senderPrivateKey
+    //   }
+    // }))
+    //         .data;
+    // debugPrint('nft ownership transfer status: $data');
   }
 
   Future<(String, String)> createAccount() async {
-    var data = (await functions.httpsCallable('createAccount').call({})).data;
-    debugPrint('newly created account details is: $data');
-    return (data['accountID'] as String, data['privateKey'] as String);
+    // var data = (await functions.httpsCallable('createAccount').call({})).data;
+    // debugPrint('newly created account details is: $data');
+    // return (data['accountID'] as String, data['privateKey'] as String);
+    return ("", "");
   }
 
   Future<List<Employee>> getEmployees({required String manufacturerID}) async {
@@ -468,7 +472,7 @@ class DataBase {
 
   deleteStaff(String id) async {
     await store.doc('employees/$id').delete();
-    await functions.httpsCallable('deleteuser').call({'data': id});
+    // await functions.httpsCallable('deleteuser').call({'data': id});
   }
 
   addProduct(Product newProduct, Brand brand, List<XFile> images) async {
@@ -801,9 +805,9 @@ class DataBase {
       String brandPK) async {
     //
     var txn = TransferModel(from: staff.accountID, to: to);
-    await functions.httpsCallable('appendFile').call({
-      'data': {'fileId': fileID, 'text': '${txn.toJson()} --- ', 'pk': brandPK}
-    });
+    // await functions.httpsCallable('appendFile').call({
+    //   'data': {'fileId': fileID, 'text': '${txn.toJson()} --- ', 'pk': brandPK}
+    // });
     var history = ItemOwnershipHistory(
       barcode: barcode,
       brandID: staff.brandID,
@@ -827,11 +831,12 @@ class DataBase {
   }
 
   createSales(String id, SalesModel salesman) async {
-    var id = await createFakeUser(salesman.email, salesman.password);
+    var id =
+        await createUser(email: salesman.email, password: salesman.password);
     salesman.id = id;
     var imageUrl = await storeImage(salesman.image, '${salesman.id}.png');
     salesman.image = imageUrl;
-    await storeFakeUser(id, 'sales');
+    await storeUser(id, 'sales');
     (await store.doc('sales/$id').set(salesman.toMap()));
   }
 
@@ -851,32 +856,33 @@ class DataBase {
 
   sendFundsEscrow(
       String senderAccountId, String senderPrivateKey, int amount) async {
-    await functions.httpsCallable('transferHbarEscrow').call({
-      'senderAccountid': senderAccountId,
-      'senderPrivateKey': senderPrivateKey,
-      'amount': amount
-    });
+    // await functions.httpsCallable('transferHbarEscrow').call({
+    //   'senderAccountid': senderAccountId,
+    //   'senderPrivateKey': senderPrivateKey,
+    //   'amount': amount
+    // });
   }
 
-  saveEscrowToHistory(Escrow escrow) async {
-    await store.doc('escrows/${escrow.id}').set(escrow.toMap());
-  }
+  // saveEscrowToHistory(Escrow escrow) async {
+  //   await store.doc('escrows/${escrow.id}').set(escrow.toMap());
+  // }
 
-  approveEscrow(Escrow escrow) async {
-    escrow.status = EscrowStatusEnum.approved;
-    debugPrint('Sending funds to the manufacturer');
-    await store.doc('escrows/${escrow.id}').update(escrow.toMap());
-    await functions.httpsCallable('approveEscrowTransfer').call({
-      'receiverAccountID': escrow.receiverAccountID,
-      'amount': escrow.amount
-    });
-  }
+  // approveEscrow(Escrow escrow) async {
+  //   escrow.status = EscrowStatusEnum.approved;
+  //   debugPrint('Sending funds to the manufacturer');
+  //   await store.doc('escrows/${escrow.id}').update(escrow.toMap());
+  //   await functions.httpsCallable('approveEscrowTransfer').call({
+  //     'receiverAccountID': escrow.receiverAccountID,
+  //     'amount': escrow.amount
+  //   });
+  // }
 
   sendQuotation(QuotationModel quotationmodel) async {
     (await store.collection('quotations').add(quotationmodel.toMap()));
   }
 
-  loadBrandNotifications({required String id}) async {
+  Future<List<QuotationModel>> loadBrandNotifications(
+      {required String id}) async {
     var docs = (await store
             .collection('quotations')
             .where('brandID', isEqualTo: id)
@@ -900,15 +906,15 @@ class DataBase {
         .data());
   }
 
-  Future<Escrow> getEscrowFromPartnershipID(String partnershipID) async {
-    return Escrow.fromMap((await store
-            .collection('escrows')
-            .where('partnershipID', isEqualTo: partnershipID)
-            .limit(1)
-            .get())
-        .docs[0]
-        .data());
-  }
+  // Future<Escrow> getEscrowFromPartnershipID(String partnershipID) async {
+  //   return Escrow.fromMap((await store
+  //           .collection('escrows')
+  //           .where('partnershipID', isEqualTo: partnershipID)
+  //           .limit(1)
+  //           .get())
+  //       .docs[0]
+  //       .data());
+  // }
 
   createAppUser({required UserModel user}) async {
     var imageUrl = await storeImage(user.profilePic, '${user.id}.png');
@@ -1005,13 +1011,13 @@ class DataBase {
 
   sendHbar(String receiverID, String senderAccountID, String senderPK,
       int amount) async {
-    var res = await functions.httpsCallable('transferHbar').call({
-      'receiverID': receiverID,
-      'senderID': senderAccountID,
-      'senderPK': senderPK,
-      'amount': amount
-    });
-    debugPrint(res.data.toString());
+    // var res = await functions.httpsCallable('transferHbar').call({
+    //   'receiverID': receiverID,
+    //   'senderID': senderAccountID,
+    //   'senderPK': senderPK,
+    //   'amount': amount
+    // });
+    // debugPrint(res.data.toString());
   }
 
   removeQuotation({required String id}) async {

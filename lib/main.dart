@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+import "package:http/http.dart" as http;
 import 'package:xscan/brand%20view/helpers/db.dart';
 import 'package:xscan/brand%20view/helpers/db2.dart';
 
+import 'all/providers/all_providers.dart';
 import 'brand view/providers/login_provider.dart';
 import 'brand view/screens/login_view.dart';
 import 'brand view/screens/main_screen.dart';
@@ -17,6 +18,7 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await FirebaseAuth.instance.useAuthEmulator('172.17.15.187', 9099);
   // await FirebaseStorage.instance.useStorageEmulator('172.17.15.187', 9199);
@@ -24,22 +26,43 @@ void main() async {
   //     host: '172.17.15.187:8080', sslEnabled: false, persistenceEnabled: false);
   GetIt.I.registerSingleton<FirebaseStorage>(FirebaseStorage.instance);
   GetIt.I.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
+  GetIt.I.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
   // GetIt.I.registerSingleton<FirebaseFirestore>(
   //     FirebaseFirestore.instance..useFirestoreEmulator('172.17.15.187', 8080));
   // GetIt.I.registerSingleton<FirebaseFunctions>(
   //     FirebaseFunctions.instance..useFunctionsEmulator('172.17.15.187', 5001));
+
+  GetIt.I.registerSingleton<http.Client>(http.Client());
   GetIt.I.registerSingleton<DataBase>(DataBase(
       auth: GetIt.I<FirebaseAuth>(),
-      functions: GetIt.I<FirebaseFunctions>(),
       storage: GetIt.I<FirebaseStorage>(),
       store: GetIt.I<FirebaseFirestore>()));
   GetIt.I.registerSingleton<BaseHelper>(BaseHelper(
       auth: GetIt.I<FirebaseAuth>(),
-      functions: GetIt.I<FirebaseFunctions>(),
       storage: GetIt.I<FirebaseStorage>(),
       store: GetIt.I<FirebaseFirestore>()));
 
-  runApp(const ProviderScope(child: MainApp()));
+  runApp(const ProviderScope(child: Resolvers()));
+}
+
+class Resolvers extends ConsumerWidget {
+  const Resolvers({super.key});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(configProvider).when(
+        data: (_) {
+          return const MainApp();
+        },
+        loading: () => const Material(
+            child: Center(child: CircularProgressIndicator.adaptive())),
+        error: (er, st) {
+          debugPrintStack(stackTrace: st);
+          return const Material(
+              child: Center(
+            child: Text("Error when configuring aws"),
+          ));
+        });
+  }
 }
 
 class MainApp extends ConsumerWidget {

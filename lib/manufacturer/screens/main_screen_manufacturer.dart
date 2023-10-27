@@ -33,7 +33,11 @@ class _MainBody extends ConsumerWidget {
         case 0:
           return ManuDashboard(data: data.$1);
         case 1:
-          return ManuNotifications(data: data.$1, notifications: data.$2);
+          return ManuNotifications(
+            data: data.$1,
+            notifications: data.$2,
+            escrows: data.$3,
+          );
         case 2:
           return PeopleView(data: data.$1);
         case 3:

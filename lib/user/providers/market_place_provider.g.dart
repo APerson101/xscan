@@ -328,7 +328,7 @@ class PutAssetForSaleProvider extends AutoDisposeFutureProvider<dynamic> {
 }
 
 String _$confirmNFTPurchaseHash() =>
-    r'b0cc15637e78da572286a4d3038a247f90f54b0e';
+    r'3ef8718fa5ed7073870f6bc3061a327ce5b3bd79';
 typedef ConfirmNFTPurchaseRef = AutoDisposeFutureProviderRef<dynamic>;
 
 /// See also [confirmNFTPurchase].

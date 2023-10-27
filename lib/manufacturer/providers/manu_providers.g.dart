@@ -6,7 +6,7 @@ part of 'manu_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loadManuInfoHash() => r'b14a0b5e2670392589893c00e6a4db4436a3cf2f';
+String _$loadManuInfoHash() => r'b8015dc699c2cf9891d28a8a96a96571069ad239';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,16 +29,16 @@ class _SystemHash {
   }
 }
 
-typedef LoadManuInfoRef
-    = AutoDisposeFutureProviderRef<(Manufacturer, List<BrandManufaturer>)>;
+typedef LoadManuInfoRef = AutoDisposeFutureProviderRef<
+    (Manufacturer, List<BrandManufaturer>, List<Escrow?>)>;
 
 /// See also [loadManuInfo].
 @ProviderFor(loadManuInfo)
 const loadManuInfoProvider = LoadManuInfoFamily();
 
 /// See also [loadManuInfo].
-class LoadManuInfoFamily
-    extends Family<AsyncValue<(Manufacturer, List<BrandManufaturer>)>> {
+class LoadManuInfoFamily extends Family<
+    AsyncValue<(Manufacturer, List<BrandManufaturer>, List<Escrow?>)>> {
   /// See also [loadManuInfo].
   const LoadManuInfoFamily();
 
@@ -76,8 +76,8 @@ class LoadManuInfoFamily
 }
 
 /// See also [loadManuInfo].
-class LoadManuInfoProvider
-    extends AutoDisposeFutureProvider<(Manufacturer, List<BrandManufaturer>)> {
+class LoadManuInfoProvider extends AutoDisposeFutureProvider<
+    (Manufacturer, List<BrandManufaturer>, List<Escrow?>)> {
   /// See also [loadManuInfo].
   LoadManuInfoProvider(
     this.id,

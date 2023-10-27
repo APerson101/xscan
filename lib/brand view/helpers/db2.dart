@@ -29,14 +29,14 @@ class BaseHelper {
   var get = GetIt.I;
   FirebaseFirestore store;
   FirebaseAuth auth;
-  FirebaseFunctions functions;
+  FirebaseFunctions? functions;
   FirebaseStorage storage;
   String baseURL = 'testnet.mirrornode.hedera.com';
   http.Client client = http.Client();
   BaseHelper(
       {required this.store,
       required this.auth,
-      required this.functions,
+      this.functions,
       required this.storage});
 
   Future<BalanceResponse> retreiveBalance({required String accountID}) async {

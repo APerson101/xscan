@@ -6,7 +6,6 @@ import 'package:xscan/worker/models/scanmodel.dart';
 
 import '../../manufacturer/models/quotation.dart';
 import '../models/brand.dart';
-import '../models/escrow.dart';
 import '../models/manufacturer_summart.dart';
 import '../models/transfer.dart';
 import '../models/verification.dart';
@@ -105,17 +104,18 @@ class ApproveProductState extends _$ApproveProductState {
     state = await AsyncValue.guard(() async {
       var db = GetIt.I<DataBase>();
       await db.approveProducts(barcode, brand.id, partnershipID);
-      var fileID = await db.getFileFromBarcode(barcode);
-      var file = await db.getFileContentDB(fileID);
-      file.brandApproved = 'true';
-      await db.appendFileBrand(brand.privateKey, fileID, file.toJson());
+      // var fileID = await db.getFileFromBarcode(barcode);
+      // var file = await db.getFileContentDB(fileID);
+      // file.brandApproved = 'true';
+      // await db.appendFileBrand(brand.privateKey, fileID, file.toJson());
       // check to see if this is the last one that needs approval then send all funds to manufacturer
       BrandManufaturer partnership =
           await db.getPartnershipFromID(partnershipID);
       if (partnership.approved == partnership.quantity) {
         // release funds from escrow
-        Escrow escrow = await db.getEscrowFromPartnershipID(partnershipID);
-        await db.approveEscrow(escrow);
+
+        // Escrow escrow = await db.getEscrowFromPartnershipID(partnershipID);
+        // await db.approveEscrow(escrow);
       }
       return ApproveProductStateEnum.successful;
     });

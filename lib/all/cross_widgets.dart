@@ -3,12 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glassmorphism_ui/glassmorphism_ui.dart';
-import 'package:xscan/all/providers/all_providers.dart';
-import 'package:xscan/all/qr_wallet.dart';
-import 'package:xscan/all/send_hbar.dart';
-import 'package:xscan/all/view_history_view.dart';
-
-import '../brand view/helpers/db2.dart';
 
 class Wallet extends ConsumerWidget {
   const Wallet(
@@ -23,86 +17,80 @@ class Wallet extends ConsumerWidget {
   final String name;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(getHbarBalanceProvider(accountID)).when(data: (data) {
-      return DecoratedBox(
-          decoration: BoxDecoration(
-              image: const DecorationImage(
-                  fit: BoxFit.fill,
-                  image: AssetImage(
-                    'assets/images/back.png',
-                  )),
-              borderRadius: BorderRadius.circular(20)),
-          child: ClipRect(
-              child: BackdropFilter(
-                  filter: ImageFilter.blur(),
-                  child: DecoratedBox(
-                      decoration:
-                          BoxDecoration(color: Colors.white.withOpacity(0)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 8),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * .3,
-                          child: Column(
-                            children: [
-                              ListTile(
-                                  title: Text("Hello, $name",
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold)),
-                                  trailing: CircleAvatar(
-                                    radius: 48,
-                                    backgroundImage: NetworkImage(image),
-                                  )),
-                              _BalanceWidget(data: data),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: _IconButtons.values
-                                    .map((e) => _IconButton(
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            switch (e) {
-                                              case _IconButtons.buy:
-                                                return const ViewHistoryView();
-                                              case _IconButtons.send:
-                                                return SendHbarView(
-                                                  accountID: accountID,
-                                                  pk: pk,
-                                                );
-                                              case _IconButtons.view:
-                                                return QRWallet(
-                                                    accountID: accountID);
-                                              default:
-                                                return const Center(
-                                                    child: Text(
-                                                        "do nothing, this is default"));
-                                            }
-                                          }));
-                                        },
-                                        button: e))
-                                    .toList(),
-                              ),
-                            ],
-                          ),
+    return DecoratedBox(
+        decoration: BoxDecoration(
+            image: const DecorationImage(
+                fit: BoxFit.fill,
+                image: AssetImage(
+                  'assets/images/back.png',
+                )),
+            borderRadius: BorderRadius.circular(20)),
+        child: ClipRect(
+            child: BackdropFilter(
+                filter: ImageFilter.blur(),
+                child: DecoratedBox(
+                    decoration:
+                        BoxDecoration(color: Colors.white.withOpacity(0)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 8),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * .3,
+                        child: Column(
+                          children: [
+                            ListTile(
+                                title: Text("Hello, $name",
+                                    style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold)),
+                                trailing: CircleAvatar(
+                                  radius: 48,
+                                  backgroundImage: NetworkImage(image),
+                                )),
+                            const _BalanceWidget(data: 1000),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            // Row(
+                            //   mainAxisAlignment:
+                            //       MainAxisAlignment.spaceEvenly,
+                            //   children: _IconButtons.values
+                            //       .map((e) => _IconButton(
+                            //           onTap: () {
+                            //             Navigator.of(context).push(
+                            //                 MaterialPageRoute(
+                            //                     builder: (context) {
+                            //               switch (e) {
+                            //                 case _IconButtons.buy:
+                            //                   return const ViewHistoryView();
+                            //                 case _IconButtons.send:
+                            //                   return SendHbarView(
+                            //                     accountID: accountID,
+                            //                     pk: pk,
+                            //                   );
+                            //                 case _IconButtons.view:
+                            //                   return QRWallet(
+                            //                       accountID: accountID);
+                            //                 default:
+                            //                   return const Center(
+                            //                       child: Text(
+                            //                           "do nothing, this is default"));
+                            //               }
+                            //             }));
+                            //           },
+                            //           button: e))
+                            //       .toList(),
+                            // ),
+                          ],
                         ),
-                      )))));
-    }, error: (er, st) {
-      return const Text("Error when loading");
-    }, loading: () {
-      return const CircularProgressIndicator.adaptive();
-    });
+                      ),
+                    )))));
   }
 }
 
 class _BalanceWidget extends ConsumerWidget {
   const _BalanceWidget({required this.data});
-  final BalanceResponse data;
+  final int data;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DecoratedBox(
@@ -118,7 +106,7 @@ class _BalanceWidget extends ConsumerWidget {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              'Hbar: ${data.hbar.toString()}',
+                              'NGN: ${ref.watch(balanceProvider)}',
                               style: const TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -182,4 +170,4 @@ enum _IconButtons {
   final Widget icon;
 }
 
-final balanceProvider = StateProvider((ref) => 0);
+final balanceProvider = StateProvider((ref) => 10000);
