@@ -31,7 +31,6 @@ void main() async {
   //     FirebaseFirestore.instance..useFirestoreEmulator('172.17.15.187', 8080));
   // GetIt.I.registerSingleton<FirebaseFunctions>(
   //     FirebaseFunctions.instance..useFunctionsEmulator('172.17.15.187', 5001));
-
   GetIt.I.registerSingleton<http.Client>(http.Client());
   GetIt.I.registerSingleton<DataBase>(DataBase(
       auth: GetIt.I<FirebaseAuth>(),
@@ -41,7 +40,6 @@ void main() async {
       auth: GetIt.I<FirebaseAuth>(),
       storage: GetIt.I<FirebaseStorage>(),
       store: GetIt.I<FirebaseFirestore>()));
-
   runApp(const ProviderScope(child: Resolvers()));
 }
 
