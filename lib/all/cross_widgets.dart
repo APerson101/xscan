@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
+import '../brand_owner_view.dart';
+
 class Wallet extends ConsumerWidget {
   const Wallet(
       {super.key,
@@ -51,36 +53,33 @@ class Wallet extends ConsumerWidget {
                             const SizedBox(
                               height: 10,
                             ),
-                            // Row(
-                            //   mainAxisAlignment:
-                            //       MainAxisAlignment.spaceEvenly,
-                            //   children: _IconButtons.values
-                            //       .map((e) => _IconButton(
-                            //           onTap: () {
-                            //             Navigator.of(context).push(
-                            //                 MaterialPageRoute(
-                            //                     builder: (context) {
-                            //               switch (e) {
-                            //                 case _IconButtons.buy:
-                            //                   return const ViewHistoryView();
-                            //                 case _IconButtons.send:
-                            //                   return SendHbarView(
-                            //                     accountID: accountID,
-                            //                     pk: pk,
-                            //                   );
-                            //                 case _IconButtons.view:
-                            //                   return QRWallet(
-                            //                       accountID: accountID);
-                            //                 default:
-                            //                   return const Center(
-                            //                       child: Text(
-                            //                           "do nothing, this is default"));
-                            //               }
-                            //             }));
-                            //           },
-                            //           button: e))
-                            //       .toList(),
-                            // ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: _IconButtons.values
+                                  .map((e) => _IconButton(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          switch (e) {
+                                            case _IconButtons.buy:
+                                              return const ViewRequests();
+                                            case _IconButtons.send:
+                                              return const NewAddition();
+                                            case _IconButtons.rejected:
+                                              return const RejectedView();
+                                            case _IconButtons.view:
+                                              return const ApprovedView();
+                                            default:
+                                              return const Center(
+                                                  child: Text(
+                                                      "do nothing, this is default"));
+                                          }
+                                        }));
+                                      },
+                                      button: e))
+                                  .toList(),
+                            ),
                           ],
                         ),
                       ),
@@ -95,8 +94,8 @@ class _BalanceWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return DecoratedBox(
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-            padding: const EdgeInsets.all(4.0),
+        child: const Padding(
+            padding: EdgeInsets.all(4.0),
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -106,8 +105,8 @@ class _BalanceWidget extends ConsumerWidget {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              'NGN: ${ref.watch(balanceProvider)}',
-                              style: const TextStyle(
+                              'ID: 889034hbn8',
+                              style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40),
@@ -158,9 +157,11 @@ class _IconButton extends ConsumerWidget {
 }
 
 enum _IconButtons {
-  buy(text: "View History", icon: Icon(Icons.history, color: Colors.white)),
-  send(text: "Send Hbar", icon: Icon(Icons.send, color: Colors.white)),
-  view(text: "View Address", icon: Icon(Icons.qr_code, color: Colors.white));
+  buy(text: "View Requests", icon: Icon(Icons.history, color: Colors.white)),
+  send(text: "New Addition", icon: Icon(Icons.send, color: Colors.white)),
+  rejected(
+      text: "View Rejected", icon: Icon(Icons.cancel, color: Colors.white)),
+  view(text: "View Approved", icon: Icon(Icons.qr_code, color: Colors.white));
 
   const _IconButtons({
     required this.text,
