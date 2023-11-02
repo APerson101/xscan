@@ -137,7 +137,7 @@ class _IconButton extends ConsumerWidget {
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(20)),
                   child: Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: button.icon,
                   ),
                 ),
@@ -146,7 +146,7 @@ class _IconButton extends ConsumerWidget {
                 ),
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4),
                   child: Text(button.text,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white)),

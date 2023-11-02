@@ -10,6 +10,7 @@ import 'package:lottie/lottie.dart';
 import 'package:uuid/uuid.dart';
 import 'package:xscan/brand%20view/models/manufacturer.dart';
 
+import '../../brand_owner_view.dart';
 import '../../customsview.dart';
 import '../models/brand.dart';
 import '../models/usermodel.dart';
@@ -138,7 +139,12 @@ class LoginView extends ConsumerWidget {
                             if (emailController.text.contains("customs")) {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => const CustomsView()));
+                            } else if (emailController.text.contains("brand")) {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const BrandOwnerView()));
                             }
+                            return;
                             ref.watch(loginStateProvider.notifier).login(
                                 emailController.text, passwordController.text);
                           }
